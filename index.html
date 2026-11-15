@@ -435,6 +435,8 @@ background:radial-gradient(circle,rgba(200,150,100,.12),transparent 65%);animati
 #evbar i{display:block;height:100%;width:50%;background:linear-gradient(90deg,#f4ead8,#d6c3a5);transition:width .6s}
 .cf{position:fixed;top:-14px;width:8px;height:12px;z-index:300;pointer-events:none;animation:cf linear forwards}
 @keyframes cf{to{transform:translateY(106vh) rotate(720deg)}}
+#board{touch-action:none;user-select:none;-webkit-user-select:none}
+.cell.dragsrc .piece{opacity:.25}
 </style>
 </head>
 <body>
@@ -1519,6 +1521,7 @@ const THEMES=[['classic','Какао'],['wood','Дерево'],['ice','Криг�
 function save(){try{localStorage.setItem('pc_set',JSON.stringify(settings))}catch(e){}}
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),1600)}
 function slideIn(div,lm,cell){
+  if(noSlide){noSlide=false;return}
   const f=document.getElementById(`c${lm.from.row}${lm.from.col}`).getBoundingClientRect(),t=cell.getBoundingClientRect();
   div.style.zIndex=30;
   div.animate([{transform:`translate(${f.left-t.left}px,${f.top-t.top}px) scale(1.12)`},{transform:'none'}],{duration:260,easing:'cubic-bezier(.22,.9,.3,1)'});
@@ -1657,6 +1660,59 @@ document.addEventListener('keydown',e=>{
   if(e.code==='KeyZ')undoMove(); else if(e.code==='KeyH')showHint(); else if(e.code==='KeyM')toggleSound(); else if(e.code==='KeyT')cycleTheme();
 });
 window.addEventListener('load',showRec);
+
+// ================================================================
+//  v4: drag & drop (mouse + touch) alongside click-to-move
+// ================================================================
+let noSlide=false;
+(function(){
+  const bd=document.getElementById('board');
+  let st=null, ghost=null, justDragged=false;
+  const pos=cell=>{const m=/^c(\d)(\d)$/.exec(cell.id);return m&&{r:+m[1],c:+m[2]}};
+  const redraw=()=>renderBoard(board,sel,possible,lastMove,inCheck(board,turn)?turn:null);
+  const cleanup=()=>{if(ghost){ghost.remove();ghost=null}document.body.style.cursor=''};
+
+  // swallow the click that follows a drag
+  bd.addEventListener('click',e=>{if(justDragged){e.stopPropagation();e.preventDefault()}},true);
+
+  bd.addEventListener('pointerdown',e=>{
+    if(e.button>0||gameOver||replayIdx>=0||(vsAI&&turn==='black')) return;
+    const cell=e.target.closest('.cell'); if(!cell) return;
+    const q=pos(cell); if(!q) return;
+    const pc=board[q.r][q.c]; if(!pc||pc.color!==turn) return;
+    st={q,x:e.clientX,y:e.clientY,active:false,id:e.pointerId};
+  });
+
+  window.addEventListener('pointermove',e=>{
+    if(!st||e.pointerId!==st.id) return;
+    if(!st.active){
+      if(Math.hypot(e.clientX-st.x,e.clientY-st.y)<6) return;
+      st.active=true;
+      const {r,c}=st.q;
+      if(!(sel&&sel.row===r&&sel.col===c)){sel={row:r,col:c};possible=legalMoves(board,r,c,epTarget);redraw()}
+      const cell=document.getElementById(`c${r}${c}`), pc=cell.querySelector('.piece'); if(!pc){st=null;return}
+      const sz=cell.getBoundingClientRect().width*1.15;
+      ghost=document.createElement('div'); ghost.innerHTML=pc.innerHTML;
+      ghost.style.cssText=`position:fixed;z-index:400;pointer-events:none;width:${sz}px;height:${sz}px;left:0;top:0;transform:translate(-50%,-50%);filter:drop-shadow(0 8px 10px rgba(0,0,0,.55))`;
+      if(ghost.firstElementChild) ghost.firstElementChild.style.cssText='width:100%;height:100%';
+      document.body.appendChild(ghost); cell.classList.add('dragsrc'); document.body.style.cursor='grabbing';
+    }
+    ghost.style.left=e.clientX+'px'; ghost.style.top=e.clientY+'px';
+  });
+
+  window.addEventListener('pointerup',e=>{
+    if(!st||e.pointerId!==st.id) return;
+    const s=st; st=null; if(!s.active) return;
+    cleanup(); justDragged=true; setTimeout(()=>justDragged=false,60);
+    const el=document.elementFromPoint(e.clientX,e.clientY), cell=el&&el.closest&&el.closest('.cell'), t=cell&&pos(cell);
+    if(t&&possible.some(m=>m.row===t.r&&m.col===t.c)){
+      noSlide=true; setTimeout(()=>noSlide=false,120);   // piece is already where it was dropped
+      onCell(t.r,t.c);
+    } else redraw();
+  });
+
+  window.addEventListener('pointercancel',()=>{if(st&&st.active){cleanup();redraw()}st=null});
+})();
 </script>
 </body>
 </html>
