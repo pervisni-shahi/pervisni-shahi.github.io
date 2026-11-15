@@ -453,130 +453,7 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
 .chat-row input{flex:1;min-width:0;padding:7px 9px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,.3);color:inherit;font:inherit;font-size:.8rem}
 .chat-row .tool{flex:0 0 40px}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js">
-// ================================================================
-//  v5: online play (PeerJS, peer-to-peer) + chat
-// ================================================================
-let online=false, myColor='white', remoteApply=false, peer=null, conn=null, onTime=0, rm={me:false,opp:false}, joinTimer=null;
-const PFX='pervisni-chess-', gid=id=>document.getElementById(id), oppOf=k=>k==='white'?'black':'white';
-function netSend(d){try{if(conn&&conn.open)conn.send(d)}catch(e){}}
-function killPeer(){clearTimeout(joinTimer);try{conn&&conn.close()}catch(e){}try{peer&&peer.destroy()}catch(e){}conn=null;peer=null}
-function openOnline(){gid('on-main').style.display='';gid('on-wait').style.display='none';gid('ov-online').classList.add('on')}
-function closeOnline(){gid('ov-online').classList.remove('on');if(!online)killPeer()}
-function showWait(code,status,share){gid('on-main').style.display='none';gid('on-wait').style.display='';gid('on-code-show').textContent=code||'';gid('on-status').textContent=status;gid('on-share').style.display=share?'':'none'}
-function genCode(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<5;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
-function needPeer(){if(typeof Peer==='undefined'){toast('Не вдалося завантажити мережевий модуль');return false}return true}
-function roomUrl(){return location.href.split('#')[0]+'#room='+gid('on-code-show').textContent}
-function shareRoom(){
-  const url=roomUrl();
-  if(navigator.share){navigator.share({title:'Первісні шахи',text:'Заходь грати в первісні шахи!',url}).catch(()=>{})}
-  else{try{navigator.clipboard.writeText(url);toast('Посилання скопійовано')}catch(e){prompt('Скопіюйте посилання:',url)}}
-}
-function hostRoom(){
-  if(!needPeer())return; killPeer(); const code=genCode(); onTime=settings.time;
-  peer=new Peer(PFX+code);
-  peer.on('open',()=>showWait(code,'Очікуємо суперника… Надішліть йому код або посилання.',true));
-  peer.on('connection',cn=>{
-    if(conn){cn.close();return}
-    conn=cn; hookConn();
-    cn.on('open',()=>{netSend({t:'start',time:onTime});myColor='white';online=true;gid('ov-online').classList.remove('on');beginOnline(false)});
-  });
-  peer.on('error',e=>{if(e.type==='unavailable-id')hostRoom();else showWait('','Помилка мережі: '+e.type,false)});
-}
-function joinRoom(){
-  if(!needPeer())return;
-  const code=gid('on-code').value.trim().toUpperCase(); if(code.length<5) return toast('Введіть код із 5 символів');
-  killPeer(); showWait(code,'Підключення…',false);
-  peer=new Peer();
-  peer.on('open',()=>{
-    conn=peer.connect(PFX+code,{reliable:true}); hookConn();
-    joinTimer=setTimeout(()=>{if(!online){showWait(code,'Не вдалося підключитися. Перевірте код і спробуйте ще раз.',false);killPeer()}},15000);
-  });
-  peer.on('error',e=>showWait(code,e.type==='peer-unavailable'?'Кімнату не знайдено. Перевірте код.':'Помилка мережі: '+e.type,false));
-}
-function hookConn(){conn.on('data',onNetData);conn.on('close',onNetClose);conn.on('error',()=>{})}
-
-function onNetData(d){
-  if(!d||typeof d!=='object') return;
-  const opp=oppOf(myColor);
-  if(d.t==='start'&&!online){clearTimeout(joinTimer);online=true;myColor='black';onTime=+d.time||0;gid('ov-online').classList.remove('on');beginOnline(false)}
-  else if(d.t==='mv'&&online&&!gameOver&&turn===opp&&d.f&&d.to){
-    const m=legalMoves(board,d.f.row,d.f.col,epTarget).find(x=>x.row===d.to.row&&x.col===d.to.col);
-    if(m&&board[d.f.row][d.f.col]?.color===opp){remoteApply=true;execMove({row:d.f.row,col:d.f.col},{row:d.to.row,col:d.to.col},m,false);remoteApply=false}
-  }
-  else if(d.t==='sur'&&online&&!gameOver){surColor=opp;remoteApply=true;doSurrender();remoteApply=false}
-  else if(d.t==='draw'&&online&&!gameOver){
-    if(drawOffered&&drawBy===myColor){drawBy=opp;respondDraw(true)}   // both offered = agreed
-    else{drawOffered=true;drawBy=opp;gid('draw-msg').textContent='Суперник пропонує нічию. Прийняти?';gid('ov-draw').classList.add('on');addLog('🤝 Суперник пропонує нічию','ed')}
-  }
-  else if(d.t==='drawr'&&online&&drawOffered&&drawBy===myColor){remoteApply=true;respondDraw(!!d.y);remoteApply=false}
-  else if(d.t==='to'&&online&&!gameOver){remoteApply=true;timeOut(opp);remoteApply=false}
-  else if(d.t==='chat'&&online&&typeof d.m==='string'){chatAdd('op',d.m.slice(0,200));toast('💬 '+d.m.slice(0,40))}
-  else if(d.t==='rm'&&online){rm.opp=true;toast('Суперник хоче реванш');if(rm.me)beginOnline(true)}
-}
-function onNetClose(){
-  if(!online) return;
-  toast('Суперник відключився');
-  if(!gameOver){
-    gameOver=true; clearInterval(tickT); addLog('📡 Суперник відключився','eg');
-    renderBoard(board,null,[],lastMove,null); updateUI();
-    showResult('Зв’язок втрачено','Суперник залишив гру.','📡');
-  }
-}
-function beginOnline(swap){
-  if(swap) myColor=oppOf(myColor);
-  rm={me:false,opp:false};
-  const old=settings.time; settings.time=onTime; startGame(false); settings.time=old;
-  document.body.classList.add('online'); document.body.classList.toggle('flip',myColor==='black');
-  const ws=gid('btn-ws'), bs=gid('btn-bs');
-  ws.style.display=myColor==='white'?'':'none'; bs.style.display=myColor==='black'?'':'none';
-  (myColor==='white'?ws:bs).textContent='🏳 Здатися';
-  gid('lbl-white').textContent=myColor==='white'?'Білі (ви)':'Білі';
-  gid('lbl-black').textContent=myColor==='black'?'Чорні (ви)':'Чорні';
-  if(myColor==='black') for(const id of ['cr','cf']){const e=gid(id);[...e.children].reverse().forEach(x=>e.appendChild(x))}
-  ensureChat();
-  addLog(`🌐 Онлайн-партія. Ви граєте ${myColor==='white'?'білими':'чорними'}.`,'eg');
-}
-function onlineRematch(){
-  if(!conn||!conn.open) return toast('Зв’язок із суперником втрачено');
-  rm.me=true; netSend({t:'rm'}); toast('Чекаємо на суперника…');
-  if(rm.opp) beginOnline(true);
-}
-function leaveOnline(){
-  const was=online; online=false; killPeer(); rm={me:false,opp:false};
-  if(!was) return;
-  document.body.classList.remove('online','flip');
-  gid('btn-ws').style.display=''; gid('btn-bs').style.display='';
-  gid('lbl-white').textContent='Білі';
-  const ch=gid('chat'); if(ch){ch.style.display='none';gid('chat-log').innerHTML=''}
-}
-// chat
-function chatAdd(cls,text){
-  const l=gid('chat-log'); if(!l) return;
-  const d=document.createElement('div'); d.className=cls;
-  const b=document.createElement('b'); b.textContent=cls==='me'?'Ви: ':'Суперник: ';
-  d.appendChild(b); d.appendChild(document.createTextNode(text)); l.appendChild(d); l.scrollTop=l.scrollHeight;
-}
-function chatSend(){
-  const i=gid('chat-in'), t=i.value.trim().slice(0,200); if(!t||!online) return;
-  netSend({t:'chat',m:t}); chatAdd('me',t); i.value='';
-}
-function ensureChat(){
-  let p=gid('chat');
-  if(!p){
-    p=document.createElement('div'); p.className='panel'; p.id='chat';
-    p.innerHTML='<div class="panel-hd">Чат</div><div id="chat-log"></div><div class="chat-row"><input id="chat-in" maxlength="200" placeholder="Повідомлення…" autocomplete="off"><button class="tool" onclick="chatSend()">➤</button></div>';
-    document.querySelector('.game-right').appendChild(p);
-    gid('chat-in').addEventListener('keydown',e=>{if(e.key==='Enter')chatSend()});
-  }
-  p.style.display='';
-}
-// open a shared invite link: …/index.html#room=ABCDE
-window.addEventListener('load',()=>{
-  const m=/room=([A-Za-z0-9]{5})/.exec(location.hash);
-  if(m){openOnline();gid('on-code').value=m[1].toUpperCase();joinRoom()}
-});
-</script>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
 <body>
 
@@ -1687,6 +1564,7 @@ function save(){try{localStorage.setItem('pc_set',JSON.stringify(settings))}catc
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),1600)}
 function slideIn(div,lm,cell){
   if(noSlide){noSlide=false;return}
+  if(!div.animate) return;
   const f=document.getElementById(`c${lm.from.row}${lm.from.col}`).getBoundingClientRect(),t=cell.getBoundingClientRect();
   const K=document.body.classList.contains('flip')?-1:1; div.style.zIndex=30;
   div.animate([{transform:`translate(${K*(f.left-t.left)}px,${K*(f.top-t.top)}px) scale(1.12)`},{transform:'none'}],{duration:260,easing:'cubic-bezier(.22,.9,.3,1)'});
@@ -1878,6 +1756,129 @@ let noSlide=false;
 
   window.addEventListener('pointercancel',()=>{if(st&&st.active){cleanup();redraw()}st=null});
 })();
+
+// ================================================================
+//  v5: online play (PeerJS, peer-to-peer) + chat
+// ================================================================
+let online=false, myColor='white', remoteApply=false, peer=null, conn=null, onTime=0, rm={me:false,opp:false}, joinTimer=null;
+const PFX='pervisni-chess-', gid=id=>document.getElementById(id), oppOf=k=>k==='white'?'black':'white';
+function netSend(d){try{if(conn&&conn.open)conn.send(d)}catch(e){}}
+function killPeer(){clearTimeout(joinTimer);try{conn&&conn.close()}catch(e){}try{peer&&peer.destroy()}catch(e){}conn=null;peer=null}
+function openOnline(){gid('on-main').style.display='';gid('on-wait').style.display='none';gid('ov-online').classList.add('on')}
+function closeOnline(){gid('ov-online').classList.remove('on');if(!online)killPeer()}
+function showWait(code,status,share){gid('on-main').style.display='none';gid('on-wait').style.display='';gid('on-code-show').textContent=code||'';gid('on-status').textContent=status;gid('on-share').style.display=share?'':'none'}
+function genCode(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<5;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
+function needPeer(){if(typeof Peer==='undefined'){toast('Не вдалося завантажити мережевий модуль');return false}return true}
+function roomUrl(){return location.href.split('#')[0]+'#room='+gid('on-code-show').textContent}
+function shareRoom(){
+  const url=roomUrl();
+  if(navigator.share){navigator.share({title:'Первісні шахи',text:'Заходь грати в первісні шахи!',url}).catch(()=>{})}
+  else{try{navigator.clipboard.writeText(url);toast('Посилання скопійовано')}catch(e){prompt('Скопіюйте посилання:',url)}}
+}
+function hostRoom(){
+  if(!needPeer())return; killPeer(); const code=genCode(); onTime=settings.time;
+  peer=new Peer(PFX+code);
+  peer.on('open',()=>showWait(code,'Очікуємо суперника… Надішліть йому код або посилання.',true));
+  peer.on('connection',cn=>{
+    if(conn){cn.close();return}
+    conn=cn; hookConn();
+    cn.on('open',()=>{netSend({t:'start',time:onTime});myColor='white';online=true;gid('ov-online').classList.remove('on');beginOnline(false)});
+  });
+  peer.on('error',e=>{if(e.type==='unavailable-id')hostRoom();else showWait('','Помилка мережі: '+e.type,false)});
+}
+function joinRoom(){
+  if(!needPeer())return;
+  const code=gid('on-code').value.trim().toUpperCase(); if(code.length<5) return toast('Введіть код із 5 символів');
+  killPeer(); showWait(code,'Підключення…',false);
+  peer=new Peer();
+  peer.on('open',()=>{
+    conn=peer.connect(PFX+code,{reliable:true}); hookConn();
+    joinTimer=setTimeout(()=>{if(!online){showWait(code,'Не вдалося підключитися. Перевірте код і спробуйте ще раз.',false);killPeer()}},15000);
+  });
+  peer.on('error',e=>showWait(code,e.type==='peer-unavailable'?'Кімнату не знайдено. Перевірте код.':'Помилка мережі: '+e.type,false));
+}
+function hookConn(){conn.on('data',onNetData);conn.on('close',onNetClose);conn.on('error',()=>{})}
+
+function onNetData(d){
+  if(!d||typeof d!=='object') return;
+  const opp=oppOf(myColor);
+  if(d.t==='start'&&!online){clearTimeout(joinTimer);online=true;myColor='black';onTime=+d.time||0;gid('ov-online').classList.remove('on');beginOnline(false)}
+  else if(d.t==='mv'&&online&&!gameOver&&turn===opp&&d.f&&d.to){
+    const m=legalMoves(board,d.f.row,d.f.col,epTarget).find(x=>x.row===d.to.row&&x.col===d.to.col);
+    if(m&&board[d.f.row][d.f.col]?.color===opp){remoteApply=true;execMove({row:d.f.row,col:d.f.col},{row:d.to.row,col:d.to.col},m,false);remoteApply=false}
+  }
+  else if(d.t==='sur'&&online&&!gameOver){surColor=opp;remoteApply=true;doSurrender();remoteApply=false}
+  else if(d.t==='draw'&&online&&!gameOver){
+    if(drawOffered&&drawBy===myColor){drawBy=opp;respondDraw(true)}   // both offered = agreed
+    else{drawOffered=true;drawBy=opp;gid('draw-msg').textContent='Суперник пропонує нічию. Прийняти?';gid('ov-draw').classList.add('on');addLog('🤝 Суперник пропонує нічию','ed')}
+  }
+  else if(d.t==='drawr'&&online&&drawOffered&&drawBy===myColor){remoteApply=true;respondDraw(!!d.y);remoteApply=false}
+  else if(d.t==='to'&&online&&!gameOver){remoteApply=true;timeOut(opp);remoteApply=false}
+  else if(d.t==='chat'&&online&&typeof d.m==='string'){chatAdd('op',d.m.slice(0,200));toast('💬 '+d.m.slice(0,40))}
+  else if(d.t==='rm'&&online){rm.opp=true;toast('Суперник хоче реванш');if(rm.me)beginOnline(true)}
+}
+function onNetClose(){
+  if(!online) return;
+  toast('Суперник відключився');
+  if(!gameOver){
+    gameOver=true; clearInterval(tickT); addLog('📡 Суперник відключився','eg');
+    renderBoard(board,null,[],lastMove,null); updateUI();
+    showResult('Зв’язок втрачено','Суперник залишив гру.','📡');
+  }
+}
+function beginOnline(swap){
+  if(swap) myColor=oppOf(myColor);
+  rm={me:false,opp:false};
+  const old=settings.time; settings.time=onTime; startGame(false); settings.time=old;
+  document.body.classList.add('online'); document.body.classList.toggle('flip',myColor==='black');
+  const ws=gid('btn-ws'), bs=gid('btn-bs');
+  ws.style.display=myColor==='white'?'':'none'; bs.style.display=myColor==='black'?'':'none';
+  (myColor==='white'?ws:bs).textContent='🏳 Здатися';
+  gid('lbl-white').textContent=myColor==='white'?'Білі (ви)':'Білі';
+  gid('lbl-black').textContent=myColor==='black'?'Чорні (ви)':'Чорні';
+  if(myColor==='black') for(const id of ['cr','cf']){const e=gid(id);[...e.children].reverse().forEach(x=>e.appendChild(x))}
+  ensureChat();
+  addLog(`🌐 Онлайн-партія. Ви граєте ${myColor==='white'?'білими':'чорними'}.`,'eg');
+}
+function onlineRematch(){
+  if(!conn||!conn.open) return toast('Зв’язок із суперником втрачено');
+  rm.me=true; netSend({t:'rm'}); toast('Чекаємо на суперника…');
+  if(rm.opp) beginOnline(true);
+}
+function leaveOnline(){
+  const was=online; online=false; killPeer(); rm={me:false,opp:false};
+  if(!was) return;
+  document.body.classList.remove('online','flip');
+  gid('btn-ws').style.display=''; gid('btn-bs').style.display='';
+  gid('lbl-white').textContent='Білі';
+  const ch=gid('chat'); if(ch){ch.style.display='none';gid('chat-log').innerHTML=''}
+}
+// chat
+function chatAdd(cls,text){
+  const l=gid('chat-log'); if(!l) return;
+  const d=document.createElement('div'); d.className=cls;
+  const b=document.createElement('b'); b.textContent=cls==='me'?'Ви: ':'Суперник: ';
+  d.appendChild(b); d.appendChild(document.createTextNode(text)); l.appendChild(d); l.scrollTop=l.scrollHeight;
+}
+function chatSend(){
+  const i=gid('chat-in'), t=i.value.trim().slice(0,200); if(!t||!online) return;
+  netSend({t:'chat',m:t}); chatAdd('me',t); i.value='';
+}
+function ensureChat(){
+  let p=gid('chat');
+  if(!p){
+    p=document.createElement('div'); p.className='panel'; p.id='chat';
+    p.innerHTML='<div class="panel-hd">Чат</div><div id="chat-log"></div><div class="chat-row"><input id="chat-in" maxlength="200" placeholder="Повідомлення…" autocomplete="off"><button class="tool" onclick="chatSend()">➤</button></div>';
+    document.querySelector('.game-right').appendChild(p);
+    gid('chat-in').addEventListener('keydown',e=>{if(e.key==='Enter')chatSend()});
+  }
+  p.style.display='';
+}
+// open a shared invite link: …/index.html#room=ABCDE
+window.addEventListener('load',()=>{
+  const m=/room=([A-Za-z0-9]{5})/.exec(location.hash);
+  if(m){openOnline();gid('on-code').value=m[1].toUpperCase();joinRoom()}
+});
 </script>
 </body>
 </html>
