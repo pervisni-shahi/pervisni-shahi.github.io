@@ -483,6 +483,7 @@ body{-webkit-text-size-adjust:100%;text-size-adjust:100%;font-synthesis:none}
   .opt-row,.panel-hd{letter-spacing:.04em}
   .btn,.ov-btn,.chips b,.p-banner{letter-spacing:0}
 }
+.opt-row{flex-wrap:wrap}.chips{flex-wrap:wrap;justify-content:flex-end}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
@@ -496,7 +497,7 @@ body{-webkit-text-size-adjust:100%;text-size-adjust:100%;font-synthesis:none}
   <p class="menu-sub">Королі та Пішні</p>
   <div class="opts">
     <div class="opt-row"><span>Рівень ШІ</span><div class="chips" id="ch-diff"><b data-v="1">Легкий</b><b data-v="2">Середній</b><b data-v="3">Сильний</b></div></div>
-    <div class="opt-row"><span>Час на партію</span><div class="chips" id="ch-time"><b data-v="0">∞</b><b data-v="3">3 хв</b><b data-v="5">5 хв</b><b data-v="10">10 хв</b></div></div>
+    <div class="opt-row"><span>Час на партію</span><div class="chips" id="ch-time"><b data-v="0">∞</b><b data-v="1">1 хв</b><b data-v="3">3 хв</b><b data-v="5">5 хв</b><b data-v="10">10 хв</b></div></div>
   </div>
   <div class="menu-btns">
     <button class="menu-btn" onclick="startGame(false)">
