@@ -115,7 +115,7 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
 .pre-info{display:none;align-items:center;justify-content:space-between;gap:8px;font-size:.85rem;color:var(--ink-2)}
 .pre-info.on{display:flex}
 .pre-info button{background:none;border:0;color:var(--accent);text-decoration:underline;text-underline-offset:3px;font-size:.85rem}
-#evbar{height:4px;border-radius:2px;background:#2b302d;overflow:hidden}
+#evbar{height:6px;border-radius:3px;background:#2b302d;border:1px solid var(--ink-2);overflow:hidden}
 #evbar i{display:block;height:100%;width:50%;background:#f3f1ea;transition:width .5s}
 
 .ait{display:none;align-items:center;gap:8px;font-size:.85rem;color:var(--ink-2)}
@@ -193,12 +193,38 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
 @keyframes cf{to{transform:translateY(106vh) rotate(720deg)}}
 
 /* ---------- mobile ---------- */
+
+/* ---------- centered layout ---------- */
+#menu{text-align:center}
+.menu-crest{display:block;font-size:2.6rem;line-height:1;margin-bottom:12px}
+.menu-sub{margin:.6em auto 1.8em}
+.opts{align-items:center}
+.opt-row{flex-direction:column;justify-content:center;gap:8px;text-align:center}
+.chips{justify-content:center}
+#recline{justify-content:center}
+.menu-btns{display:flex;flex-direction:column;gap:10px;border-top:0}
+.menu-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface);text-align:center}
+.menu-btn:hover{padding-left:18px;border-color:var(--ink-2)}
+.menu-btn-icon{font-size:1.7rem;line-height:1;flex:0 0 auto}
+.menu-btn-text{display:block;text-align:center}
+#status{text-align:center}
+.pre-info{justify-content:center;gap:12px}
+.ait{justify-content:center}
+.btn{text-align:center}
+.tools{justify-content:center}
+.panel-hd{text-align:center}
+.ov-box{text-align:center}
+.ov-btns{justify-content:center}
+.field,.field-l{text-align:center}
+.field.err{border-color:var(--danger)}
+#ov-rules ul{text-align:left}
+
 @media(max-width:620px){
   body{padding:12px 8px 32px}
   #game{flex-direction:column;align-items:center;gap:12px}
   .game-left{width:100%}
   .game-right{width:100%;max-width:430px;flex-direction:row;flex-wrap:wrap;gap:8px}
-  #status,.ait,.pre-info,#fin-skip,#evbar{flex:1 1 100%}
+  #status,.ait,.pre-info,#evbar{flex:1 1 100%}
   .act{flex:1 1 100%;flex-direction:row;flex-wrap:wrap}
   .act .btn{flex:1 1 calc(50% - 4px);width:auto;min-width:110px;font-size:.82rem;padding:7px 9px}
   .tools{flex:1 1 100%}
@@ -215,24 +241,25 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
 
 <!-- MENU -->
 <div id="menu">
+  <span class="menu-crest">♟</span>
   <h1 class="menu-title">Первісні шахи</h1>
-  <p class="menu-sub">Лише королі та пішні. Мат або відсутність безпечних ходів — поразка.</p>
+  <p class="menu-sub">Королі та пішні</p>
   <div class="opts">
     <div class="opt-row"><span>Рівень ШІ</span><div class="chips" id="ch-diff"><button type="button" data-v="1">Легкий</button><button type="button" data-v="2">Середній</button><button type="button" data-v="3">Сильний</button></div></div>
-    <div class="opt-row"><span>Час на партію</span><div class="chips" id="ch-time"><button type="button" data-v="0">Без часу</button><button type="button" data-v="1">1 хв</button><button type="button" data-v="3">3 хв</button><button type="button" data-v="5">5 хв</button><button type="button" data-v="10">10 хв</button></div></div>
+    <div class="opt-row"><span>Час на партію</span><div class="chips" id="ch-time"><button type="button" data-v="0">∞</button><button type="button" data-v="1">1 хв</button><button type="button" data-v="3">3 хв</button><button type="button" data-v="5">5 хв</button><button type="button" data-v="10">10 хв</button></div></div>
   </div>
   <div class="menu-btns">
     <button class="menu-btn" onclick="startGame(false)">
-      <span class="menu-btn-title">Грати з другом</span>
-      <span class="menu-btn-desc">На одному пристрої</span>
+      <span class="menu-btn-icon">⚔️</span>
+      <span class="menu-btn-text"><span class="menu-btn-title">Грати з другом</span><span class="menu-btn-desc">Грати на одному пристрої</span></span>
     </button>
     <button class="menu-btn" onclick="startGame(true)">
-      <span class="menu-btn-title">Грати проти ШІ</span>
-      <span class="menu-btn-desc">Ви білими, комп’ютер чорними</span>
+      <span class="menu-btn-icon">🤖</span>
+      <span class="menu-btn-text"><span class="menu-btn-title">Грати проти ШІ</span><span class="menu-btn-desc">Грати проти рушія, що намагається виграти</span></span>
     </button>
     <button class="menu-btn" onclick="openOnline()">
-      <span class="menu-btn-title">Грати онлайн</span>
-      <span class="menu-btn-desc">З другом через інтернет, за кодом кімнати</span>
+      <span class="menu-btn-icon">🌐</span>
+      <span class="menu-btn-text"><span class="menu-btn-title">Грати онлайн</span><span class="menu-btn-desc">Грати з другом через інтернет</span></span>
     </button>
   </div>
 </div>
@@ -271,7 +298,6 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
   <div class="game-right">
     <div id="status">Хід білих</div>
     <div id="pre-info" class="pre-info"><span id="pre-n"></span><button type="button" onclick="clearPre()">Скасувати</button></div>
-    <button id="fin-skip" class="btn btn-menu" onclick="skipFinale()" style="display:none">Закінчити без взяття</button>
     <div id="evbar" title="Перевага"><i id="evw"></i></div>
     <div class="ait" id="ait">
       <span>ШІ думає</span>
@@ -335,9 +361,8 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
       <li>Пішні ходять і б’ють як у звичайних шахах, включно з ходом на дві клітинки та взяттям на проході.</li>
       <li>Пішень, що дійшов до кінця дошки, стає ферзем.</li>
       <li>Мат — перемога. Пату немає: хто не має безпечного ходу, той програє.</li>
-      <li>Після мату чи пату переможець робить ще один, символічний хід — забирає короля. Якщо жодна фігура не б’є короля (пат), забрати його може будь-яка. Можна й пропустити.</li>
       <li>Попередні ходи: поки суперник думає, можна поставити в чергу скільки завгодно своїх ходів. Фігура, що вже «походила» наперед, може так само забирати фігури суперника. Черга виконується по одному ходу, і якщо хід став неможливим, уся черга скасовується. Скасувати чергу: права кнопка миші, Esc або «Скасувати». Працює проти ШІ й онлайн.</li>
-      <li>Нічия: за згодою, за правилом 50 ходів або при триразовому повторенні позиції.</li>
+      <li>Нічия: за згодою, за правилом 50 ходів, при триразовому повторенні позиції, а також одразу, коли на дошці лишилися самі королі — матеріалу для мату немає.</li>
       <li>Годинник рахує від початку вашого ходу до моменту, коли фігуру переставлено, з точністю до мілісекунди. Хто першим вичерпав час, той програє.</li>
     </ul>
     <div class="ov-btns"><button class="ov-btn ov-pri" onclick="this.closest('.ov').classList.remove('on')">Зрозуміло</button></div>
@@ -352,8 +377,8 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
     <div class="ov-rule"></div>
     <div id="on-main">
       <label class="field-l" for="on-nick">Ваш нікнейм</label>
-      <input id="on-nick" class="field" maxlength="16" placeholder="Необов’язково" autocomplete="off">
-      <p class="field-note">Можна залишити порожнім — тоді суперник побачить «Анонім».</p>
+      <input id="on-nick" class="field" maxlength="16" placeholder="Наприклад, Оля" autocomplete="off" required>
+      <p class="field-note">Нікнейм обов’язковий: його побачить суперник.</p>
       <button class="ov-btn ov-pri" onclick="hostRoom()">Створити кімнату</button>
       <p class="on-sep">або приєднайтесь за кодом</p>
       <div class="ov-btns"><input id="on-code" class="on-inp" maxlength="3" inputmode="numeric" pattern="[0-9]*" placeholder="000" autocomplete="off" oninput="this.value=this.value.replace(/\D/g,'')"><button class="ov-btn ov-pri" onclick="joinRoom()">Увійти</button></div>
@@ -637,7 +662,8 @@ let fmn=1; // full move number for log
 let halfMoveClock=0;  // resets on capture or pawn move (50-move rule)
 let posHistory={};    // position key -> count (threefold repetition)
 let pre=[];           // queue of premoves [{from,to}], unlimited
-let finale=null;      // symbolic king capture after mate/stalemate
+let gameId=0;
+function later(fn,ms){const id=gameId;return setTimeout(()=>{if(id===gameId)fn()},ms)}
 let freeMove=false, remoteClock=null, turnStart=0;
 
 // History for replay
@@ -868,25 +894,21 @@ function renderBoard(b, selPos, pmoves, lm, chkColor) {
 
 function updateUI(){updateEval();
   const sd=document.getElementById('status');
-  const chk=!gameOver&&!finale&&inCheck(board,turn);
-  sd.classList.toggle('chk',chk||!!finale);
-  if(gameOver){sd.textContent='Гру завершено';updateSkipBtn();updatePreInfo();return}
-  if(finale){
-    const W=finale.winner==='white'?'Білі':'Чорні';
-    sd.textContent=`${finale.kind==='mate'?'Мат':'Пат'}: ${W} забирають короля`;
-  }
-  else if(chk) sd.textContent=`Шах ${turn==='white'?'білим':'чорним'}`;
+  const chk=inCheck(board,turn);
+  sd.classList.toggle('chk',chk);
+  if(gameOver){sd.textContent='Гру завершено';updatePreInfo();return}
+  if(chk) sd.textContent=`Шах ${turn==='white'?'білим':'чорним'}`;
   else sd.textContent=turn==='white'?'Хід білих':'Хід чорних';
   document.getElementById('bn-white').classList.toggle('active',turn==='white');
   document.getElementById('bn-black').classList.toggle('active',turn==='black');
-  updateSkipBtn(); updatePreInfo();
+  updatePreInfo();
 }
 
 // ================================================================
 //  PREMOVES — unlimited queue, played on a virtual board
 // ================================================================
 function pmSide(){return vsAI?'white':(online?myColor:null)}
-function preMode(){const s=pmSide();return !!s&&turn!==s&&!gameOver&&!finale&&replayIdx<0}
+function preMode(){const s=pmSide();return !!s&&turn!==s&&!gameOver&&replayIdx<0}
 function preMoves(b,r,c){
   if(!b[r][c]) return [];
   // pseudo-legal on the virtual board; own pieces that already "moved" can capture too.
@@ -916,7 +938,7 @@ function clearPre(silent){
   updatePreInfo();
 }
 function tryPremove(){
-  if(!pre.length||gameOver||finale||replayIdx>=0) return;
+  if(!pre.length||gameOver||replayIdx>=0) return;
   const me=pmSide(); if(!me||turn!==me) return;
   const pm=pre.shift(), p=board[pm.from.row][pm.from.col];
   const m=(p&&p.color===me)?legalMoves(board,pm.from.row,pm.from.col,epTarget).find(x=>x.row===pm.to.row&&x.col===pm.to.col):null;
@@ -930,61 +952,28 @@ function tryPremove(){
 // ================================================================
 function chkTarget(){
   if(gameOver) return null;
-  if(finale) return finale.loser;
   return inCheck(board,turn)?turn:null;
 }
 function redrawBoard(){renderBoard(board,sel,possible,lastMove,chkTarget())}
-function selMoves(r,c){return finale?finaleMoves(r,c):legalMoves(board,r,c,epTarget)}
-function finaleMoves(r,c){
-  const p=board[r][c]; if(!finale||!p||p.color!==finale.winner) return [];
-  const k=findKing(board,finale.loser); if(!k) return [];
-  const direct=rawMoves(board,r,c,null).find(m=>m.row===k.row&&m.col===k.col);
-  if(direct) return [direct];
-  if(!isAttacked(board,k.row,k.col,finale.winner)) return [{row:k.row,col:k.col,kind:'capture'}];
-  return [];
-}
-function finActor(){
-  return !!finale&&!(vsAI&&finale.winner==='black')&&!(online&&finale.winner!==myColor);
-}
-function updateSkipBtn(){
-  const b=document.getElementById('fin-skip'); if(b) b.style.display=(finale&&!gameOver&&finActor())?'':'none';
-}
-function enterFinale(kind){
+function selMoves(r,c){return legalMoves(board,r,c,epTarget)}
+function endByNoMoves(kind){
   const loser=turn, winner=loser==='white'?'black':'white';
   const W=winner==='white'?'Білі':'Чорні', L=loser==='white'?'Білі':'Чорні';
   history.push({board:snapBoard(board),from:null,to:null,turn:loser,ep:{},check:kind==='mate'});
-  finale={kind,winner,loser,
-    title:kind==='mate'?'Мат':'Пат',
-    msg:kind==='mate'?`${W} перемагають!`:`${L} не мали безпечного ходу. ${W} перемагають!`};
+  sel=null; possible=[]; pre.length=0;
+  if(kind==='mate') markLastMove('#');
   addLog(kind==='mate'?`Мат ${loser==='white'?'білим':'чорним'}`:`${L} не мають безпечних ходів`,'eg');
-  turn=winner; sel=null; possible=[]; pre.length=0;
-  setUI(true); clearInterval(tickT);
-  if(kind==='mate') playCheck(); else playMove();
-  renderBoard(board,null,[],lastMove,chkTarget()); updateUI(); drawClocks();
-  if(finActor()) toast('Заберіть короля — останній, символічний хід');
-  if(vsAI&&winner==='black') setTimeout(aiFinale,800);
-}
-function aiFinale(){
-  if(!finale||gameOver||!vsAI||finale.winner!=='black') return;
-  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-    if(board[r][c]?.color!=='black') continue;
-    const mv=finaleMoves(r,c)[0];
-    if(mv){execMove({row:r,col:c},{row:mv.row,col:mv.col},mv,true);return}
-  }
-  finishFinale();
-}
-function skipFinale(){
-  if(!finale||!finActor()) return;
-  if(online) netSend({t:'fin'});
-  finishFinale();
-}
-function finishFinale(){
-  const f=finale; if(!f) return;
-  finale=null; sel=null; possible=[]; pre.length=0;
-  history.push({board:snapBoard(board),from:null,to:null,turn:f.loser,ep:{},check:false});
   gameOver=true; clearInterval(tickT);
-  renderBoard(board,null,[],lastMove,null); updateUI(); drawClocks();
-  setTimeout(()=>{playCheckmate();showResult(f.title,f.msg,'')},500);
+  renderBoard(board,null,[],lastMove,kind==='mate'?loser:null); updateUI(); drawClocks();
+  later(()=>{playCheckmate();showResult(kind==='mate'?'Мат':'Пат',kind==='mate'?`${W} перемагають!`:`${L} не мали безпечного ходу. ${W} перемагають!`,'')},500);
+}
+function markLastMove(sfx){
+  const e=document.getElementById('log').firstElementChild;
+  if(e&&/^\d+\.{1,3} /.test(e.textContent)) e.textContent+=sfx;
+}
+function onlyKings(b){
+  for(let r=0;r<8;r++) for(let c=0;c<8;c++) if(b[r][c]&&b[r][c].type!=='king') return false;
+  return true;
 }
 
 // ================================================================
@@ -1026,11 +1015,17 @@ function showPromoDialog(color, callback) {
   callback('queen');
 }
 
+const PROM_LET={queen:'Ф',rook:'Л',bishop:'С',knight:'К'};
+function moveText(piece,from,to,isCapture,promType){
+  return `${piece.type==='king'?'Кр':''}${toAN(from.row,from.col)}${isCapture?'x':'-'}${toAN(to.row,to.col)}${promType?'='+PROM_LET[promType]:''}`;
+}
+function moveLine(color,txt){return color==='white'?`${fmn}. ${txt}`:`${fmn-1}... ${txt}`}
+
 function execMove(from,to,m,isAI=false){
   const mover=turn;
-  if(timeCtl&&!finale&&!remoteApply&&!freeMove&&clockLeft(mover)<=0){timeOut(mover);return}
-  if(!finale) chargeClock();
-  if(remoteApply&&remoteClock!=null&&timeCtl&&!finale) clocks[mover]=Math.max(0,Math.min(timeCtl,remoteClock));
+  if(timeCtl&&!remoteApply&&!freeMove&&clockLeft(mover)<=0){timeOut(mover);return}
+  chargeClock();
+  if(remoteApply&&remoteClock!=null&&timeCtl) clocks[mover]=Math.max(0,Math.min(timeCtl,remoteClock));
   remoteClock=null;
   pushSnap(); if(online&&!remoteApply) netSend({t:"mv",f:{row:from.row,col:from.col},to:{row:to.row,col:to.col},ct:timeCtl?Math.round(clocks[mover]):null});
   const piece=board[from.row][from.col];
@@ -1059,11 +1054,7 @@ function execMove(from,to,m,isAI=false){
     // Show dialog then finish move
     showPromoDialog(piece.color, (promType) => {
       board[to.row][to.col]={type:promType,color:piece.color,hasMoved:true};
-      const promSyms={queen:'♕',rook:'♖',bishop:'♗',knight:'♘'};
-      const promSymsB={queen:'♛',rook:'♜',bishop:'♝',knight:'♞'};
-      const sym2=piece.color==='white'?promSyms:promSymsB;
-      const logSym={white:{king:'♔',queen:'♕',pawn:'♙'},black:{king:'♚',queen:'♛',pawn:'♟'}};
-      const s=`${piece.color==='white'?`${fmn}. `:''}${logSym[piece.color][piece.type]} ${toAN(from.row,from.col)}${isCapture?'×':'-'}${toAN(to.row,to.col)} =${sym2[promType]}`;
+      const s=moveLine(piece.color,moveText(piece,from,to,isCapture,promType));
       if(piece.color==='white') fmn++;
       addLog(s, piece.color==='white'?'wm':'bm');
       finishMove(piece, isCapture, true, promType, isAI);
@@ -1085,11 +1076,7 @@ function execMove(from,to,m,isAI=false){
   else halfMoveClock++;
 
   // Log
-  const sym={white:{king:'♔',queen:'♕',pawn:'♙',knight:'♘',bishop:'♗',rook:'♖'},black:{king:'♚',queen:'♛',pawn:'♟',knight:'♞',bishop:'♝',rook:'♜'}};
-  const promSymsLog={queen:'♕',rook:'♖',bishop:'♗',knight:'♘'};
-  const promSymsLogB={queen:'♛',rook:'♜',bishop:'♝',knight:'♞'};
-  const promName=promoted?(piece.color==='white'?promSymsLog:promSymsLogB)[aiPromType||'queen']:'';
-  const s=`${piece.color==='white'?`${fmn}. `:''}${sym[piece.color][piece.type]} ${toAN(from.row,from.col)}${isCapture?'×':'-'}${toAN(to.row,to.col)}${promoted?' ='+promName:''}`;
+  const s=moveLine(piece.color,moveText(piece,from,to,isCapture,promoted?(aiPromType||'queen'):null));
   if(piece.color==='white') fmn++;
   addLog(s, isAI?'bm ai':(piece.color==='white'?'wm':'bm'));
 
@@ -1097,7 +1084,6 @@ function execMove(from,to,m,isAI=false){
 }
 
 function finishMove(piece, isCapture, promoted, promType, isAI){
-  if(finale){ finishFinale(); return }
   animPending=true;
   turn=turn==='white'?'black':'white';
   const chk=inCheck(board,turn), hasMvs=hasLegal(board,turn,epTarget);
@@ -1107,12 +1093,21 @@ function finishMove(piece, isCapture, promoted, promType, isAI){
   else if(isCapture) playCapture();
   else playMove();
 
+  // ── INSUFFICIENT MATERIAL: only kings left ───────────────
+  if(onlyKings(board)){
+    history.push({board:snapBoard(board),from:null,to:null,turn,ep:{},check:false});
+    addLog('Нічия: на дошці лишилися самі королі','eg'); gameOver=true; pre.length=0; clearInterval(tickT);
+    renderBoard(board,null,[],lastMove,null); updateUI(); drawClocks();
+    later(()=>showResult('Нічия','Недостатньо матеріалу для мату: лишилися самі королі.',''),400);
+    return;
+  }
+
   // ── 50-MOVE RULE ─────────────────────────────────────────
   if(halfMoveClock>=100){
     history.push({board:snapBoard(board),from:null,to:null,turn,ep:{},check:false});
     addLog('Нічия: правило 50 ходів','eg'); gameOver=true;
     renderBoard(board,null,[],lastMove,null); updateUI();
-    setTimeout(()=>showResult('Нічия','Правило 50 ходів: жодного взяття чи ходу пішнем','⏱'),400);
+    later(()=>showResult('Нічия','Правило 50 ходів: жодного взяття чи ходу пішнем','⏱'),400);
     return;
   }
 
@@ -1122,24 +1117,22 @@ function finishMove(piece, isCapture, promoted, promType, isAI){
     history.push({board:snapBoard(board),from:null,to:null,turn,ep:{},check:false});
     addLog('Нічия: потрійне повторення','eg'); gameOver=true;
     renderBoard(board,null,[],lastMove,null); updateUI();
-    setTimeout(()=>showResult('Нічия','Позиція повторилась тричі','🔄'),400);
+    later(()=>showResult('Нічия','Позиція повторилась тричі','🔄'),400);
     return;
   }
 
-  if(!hasMvs){ enterFinale(chk?'mate':'stalemate'); return; }
-  else if(chk){
-    playCheck(); addLog(`Шах ${turn==='white'?'білим':'чорним'}`,'ec');
-  }
+  if(!hasMvs){ endByNoMoves(chk?'mate':'stalemate'); return; }
+  else if(chk){ playCheck(); markLastMove('+'); }
 
   renderBoard(board,null,[],lastMove,chk?turn:null);
   updateUI();
   if(timeCtl) turnStart=performance.now();
-  if(pre.length&&pmSide()&&turn===pmSide()) setTimeout(tryPremove,200);
+  if(pre.length&&pmSide()&&turn===pmSide()) later(tryPremove,200);
 
   if(vsAI&&turn==='black'&&!gameOver){
     setUI(true);
     document.getElementById('ait').classList.add('on');
-    setTimeout(doAI,450+Math.random()*400);
+    later(doAI,settings.diff===3?120:450+Math.random()*400);
   }
 }
 
@@ -1183,7 +1176,7 @@ function offerDraw(){ if(online){ if(gameOver||drawOffered) return; drawOffered=
   document.getElementById('btn-draw').classList.add('offered');
   addLog(`${turn==='white'?'Білі':'Чорні'} пропонують нічию`,'ed');
   if(vsAI&&turn==='white'){
-    setTimeout(()=>{
+    later(()=>{
       if(aiAcceptDraw()){addLog('ШІ приймає нічию','ai');gameOver=true;renderBoard(board,null,[],lastMove,null);updateUI();playDraw();showResult('Нічия','ШІ погодився.','🤝')}
       else{addLog('ШІ відхиляє нічию','ai');resetDraw()}
     },900);
@@ -1256,85 +1249,411 @@ function exitReplay(){
 // ================================================================
 //  AI — Minimax α/β
 // ================================================================
-function evalBoard(b){
-  let s=0,wp=0,bp=0,wq=0,bq=0;
-  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-    const p=b[r][c]; if(!p) continue;
-    let v=0;
-    if(p.type==='pawn'){
-      v=100;
-      const adv=p.color==='white'?(7-r):r; v+=adv*18;
-      if(c>=2&&c<=5)v+=12; if(c>=3&&c<=4)v+=8;
-      if(c>0&&b[r][c-1]?.type==='pawn'&&b[r][c-1].color===p.color)v+=7;
-      if(c<7&&b[r][c+1]?.type==='pawn'&&b[r][c+1].color===p.color)v+=7;
-      if(p.color==='white')wp++;else bp++;
-    } else if(p.type==='queen'){
-      v=900; v+=queenMoves(b,r,c,p.color).length*3;
-      if(p.color==='white')wq++;else bq++;
-    } else if(p.type==='king'){
-      v=20000;
-      if(wp+bp<8){const d=Math.max(Math.abs(r-3.5),Math.abs(c-3.5));v-=d*10}
+// ================================================================
+//  AI ENGINE — compact board, make/unmake, α/β + TT + iterative deepening
+//  codes: 1 pawn (not moved yet), 4 pawn (moved), 2 king, 3 queen; white +, black −
+// ================================================================
+const AI=(()=>{
+  const B=new Int8Array(64);
+  let ep=-1, side=1, h1=0, h2=0;
+  const KS=[0,0];
+  const MATE=30000, MAXP=60, INF=1e9;
+
+  // Zobrist keys
+  let seed=0x9E3779B9|0;
+  const rnd=()=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return seed|0};
+  const Z1=new Int32Array(9*64), Z2=new Int32Array(9*64), E1=new Int32Array(65), E2=new Int32Array(65);
+  for(let i=0;i<9*64;i++){Z1[i]=rnd();Z2[i]=rnd()}
+  for(let i=0;i<65;i++){E1[i]=rnd();E2[i]=rnd()}
+  const S1=rnd(), S2=rnd();
+  const zi=(p,sq)=>(p+4)*64+sq;
+
+  // transposition table
+  const TTN=1<<17, TTM=TTN-1;
+  const tk1=new Int32Array(TTN), tk2=new Int32Array(TTN), td=new Int8Array(TTN), tf=new Int8Array(TTN), ts=new Int32Array(TTN), tm=new Int32Array(TTN);
+
+  const MV=Array.from({length:MAXP+10},()=>new Int32Array(400));
+  const SC=Array.from({length:MAXP+10},()=>new Int32Array(400));
+  const U_p=new Int8Array(MAXP+10), U_cap=new Int8Array(MAXP+10), U_cs=new Int8Array(MAXP+10), U_ep=new Int8Array(MAXP+10);
+  const U_h1=new Int32Array(MAXP+10), U_h2=new Int32Array(MAXP+10);
+  const KIL=new Int32Array(MAXP+10);
+
+  let nodes=0, stop=false, deadline=0, lastScore=0, lastDepth=0;
+
+  function load(b,color,epObj){
+    B.fill(0); h1=0; h2=0;
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+      const p=b[r][c]; if(!p) continue;
+      let v=p.type==='king'?2:p.type==='queen'?3:(p.hasMoved?4:1);
+      if(p.type!=='pawn'&&p.type!=='king'&&p.type!=='queen') continue;
+      if(p.color==='black') v=-v;
+      const sq=r*8+c; B[sq]=v;
+      if(p.type==='king') KS[p.color==='white'?0:1]=sq;
+      h1^=Z1[zi(v,sq)]; h2^=Z2[zi(v,sq)];
     }
-    s+=p.color==='black'?v:-v;
+    side=color==='white'?1:-1;
+    ep=epObj?epObj.row*8+epObj.col:-1;
+    if(side<0){h1^=S1;h2^=S2}
+    h1^=E1[ep+1]; h2^=E2[ep+1];
   }
-  if(bq>0&&wq===0)s+=400; if(wq>0&&bq===0)s-=400;
-  return s;
-}
-function allMoves(b,color,ep){
-  const ms=[];
-  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-    if(b[r][c]?.color!==color) continue;
-    for(const m of legalMoves(b,r,c,ep)) ms.push({from:{row:r,col:c},to:{row:m.row,col:m.col},m});
+
+  function capScore(q,p){
+    const aq=q<0?-q:q, ap=p<0?-p:p;
+    const vv=aq===2?1000000:aq===3?5000:1000;
+    const av=ap===3?50:ap===2?30:10;
+    return 10000+vv-av;
   }
-  ms.sort((a,b2)=>(b2.m.kind==='capture'?1:0)-(a.m.kind==='capture'?1:0));
-  return ms;
-}
-function minimax(b,depth,alpha,beta,maximize,color,ep){
-  const opp=color==='white'?'black':'white';
-  const mvs=allMoves(b,color,ep);
-  if(!mvs.length) return (maximize?-200000:200000)+(maximize?depth:-depth);
-  if(depth===0) return evalBoard(b);
-  let best=maximize?-Infinity:Infinity;
-  for(const{from,to,m} of mvs){
-    const nb=applyMove(b,from,to,m,ep);
-    const nep=m.kind==='double'?{row:from.row+(b[from.row][from.col].color==='white'?-1:1),col:from.col}:null;
-    const sc=minimax(nb,depth-1,alpha,beta,!maximize,opp,nep);
-    if(maximize){if(sc>best)best=sc;if(sc>alpha)alpha=sc}
-    else{if(sc<best)best=sc;if(sc<beta)beta=sc}
-    if(beta<=alpha) break;
+
+  function gen(ply,caps){
+    const mv=MV[ply], sc=SC[ply]; let n=0; const s=side;
+    for(let sq=0;sq<64;sq++){
+      const p=B[sq]; if(p===0||(p>0)!==(s>0)) continue;
+      const a=p<0?-p:p, r=sq>>3, c=sq&7;
+      if(a===2){
+        for(let dr=-1;dr<=1;dr++){const nr=r+dr; if(nr<0||nr>7) continue;
+          for(let dc=-1;dc<=1;dc++){ if(!dr&&!dc) continue; const nc=c+dc; if(nc<0||nc>7) continue;
+            const t=nr*8+nc, q=B[t];
+            if(q===0){ if(!caps){mv[n]=sq|(t<<6);sc[n++]=0} }
+            else if((q>0)!==(s>0)){mv[n]=sq|(t<<6);sc[n++]=capScore(q,p)}
+          }}
+      } else if(a===3){
+        for(let d=0;d<8;d++){
+          const dr=DR[d], dc=DC[d]; let nr=r+dr, nc=c+dc;
+          while(nr>=0&&nr<8&&nc>=0&&nc<8){
+            const t=nr*8+nc, q=B[t];
+            if(q===0){ if(!caps){mv[n]=sq|(t<<6);sc[n++]=1} }
+            else { if((q>0)!==(s>0)){mv[n]=sq|(t<<6);sc[n++]=capScore(q,p)} break }
+            nr+=dr; nc+=dc;
+          }
+        }
+      } else {
+        const d=s>0?-1:1, r1=r+d;
+        if(r1<0||r1>7) continue;
+        const last=s>0?r1===0:r1===7;
+        const t=r1*8+c;
+        if(B[t]===0){
+          if(last){mv[n]=sq|(t<<6)|(3<<12);sc[n++]=19000}
+          else if(!caps){
+            const adv=s>0?7-r1:r1;
+            mv[n]=sq|(t<<6);sc[n++]=100+adv*10;
+            if(a===1){const r2=r+2*d; if(r2>=0&&r2<=7&&B[r2*8+c]===0){mv[n]=sq|((r2*8+c)<<6)|(1<<12);sc[n++]=100+adv*10+5}}
+          }
+        }
+        for(let k=-1;k<=1;k+=2){
+          const nc=c+k; if(nc<0||nc>7) continue;
+          const t2=r1*8+nc, q=B[t2];
+          if(q!==0){
+            if((q>0)!==(s>0)){mv[n]=sq|(t2<<6)|(last?(3<<12):0);sc[n++]=capScore(q,p)+(last?9000:0)}
+          } else if(t2===ep){
+            const cs=r*8+nc, qq=B[cs];
+            if(qq!==0&&(qq>0)!==(s>0)&&(qq===1||qq===-1||qq===4||qq===-4)){mv[n]=sq|(t2<<6)|(2<<12);sc[n++]=capScore(qq,p)}
+          }
+        }
+      }
+    }
+    return n;
   }
-  return best;
-}
+  const DR=[-1,1,0,0,-1,-1,1,1], DC=[0,0,-1,1,-1,1,-1,1];
+
+  function make(m,ply){
+    const f=m&63, t=(m>>6)&63, fl=m>>12, p=B[f], ap=p<0?-p:p;
+    U_p[ply]=p; U_ep[ply]=ep; U_h1[ply]=h1; U_h2[ply]=h2;
+    h1^=Z1[zi(p,f)]; h2^=Z2[zi(p,f)];
+    let cap=B[t];
+    if(fl===2){
+      const cs=(f>>3)*8+(t&7); cap=B[cs]; B[cs]=0; U_cs[ply]=cs;
+      h1^=Z1[zi(cap,cs)]; h2^=Z2[zi(cap,cs)];
+    } else {
+      U_cs[ply]=t;
+      if(cap!==0){h1^=Z1[zi(cap,t)]; h2^=Z2[zi(cap,t)]}
+    }
+    U_cap[ply]=cap;
+    let np=p;
+    if(ap===1||ap===4) np=p>0?4:-4;
+    if(fl===3) np=p>0?3:-3;
+    B[t]=np; B[f]=0;
+    h1^=Z1[zi(np,t)]; h2^=Z2[zi(np,t)];
+    if(ap===2) KS[p>0?0:1]=t;
+    h1^=E1[ep+1]; h2^=E2[ep+1];
+    ep=fl===1?((f+t)>>1):-1;
+    h1^=E1[ep+1]; h2^=E2[ep+1];
+    side=-side; h1^=S1; h2^=S2;
+  }
+  function unmake(m,ply){
+    const f=m&63, t=(m>>6)&63, fl=m>>12, p=U_p[ply];
+    B[f]=p; B[t]=0;
+    if(fl===2) B[U_cs[ply]]=U_cap[ply]; else B[t]=U_cap[ply];
+    if(p===2||p===-2) KS[p>0?0:1]=f;
+    ep=U_ep[ply]; h1=U_h1[ply]; h2=U_h2[ply]; side=-side;
+  }
+
+  // is square sq attacked by side `by` (+1 white / -1 black)?
+  function attacked(sq,by){
+    const r=sq>>3, c=sq&7;
+    const pr=by>0?r+1:r-1;
+    if(pr>=0&&pr<=7){
+      for(let k=-1;k<=1;k+=2){const nc=c+k; if(nc<0||nc>7) continue;
+        const q=B[pr*8+nc]; if(q===by||q===4*by) return true}
+    }
+    for(let dr=-1;dr<=1;dr++){const nr=r+dr; if(nr<0||nr>7) continue;
+      for(let dc=-1;dc<=1;dc++){ if(!dr&&!dc) continue; const nc=c+dc; if(nc<0||nc>7) continue;
+        if(B[nr*8+nc]===2*by) return true }}
+    for(let d=0;d<8;d++){
+      let nr=r+DR[d], nc=c+DC[d];
+      while(nr>=0&&nr<8&&nc>=0&&nc<8){
+        const q=B[nr*8+nc];
+        if(q!==0){ if(q===3*by) return true; break }
+        nr+=DR[d]; nc+=DC[d];
+      }
+    }
+    return false;
+  }
+
+  const minB=new Int8Array(8), maxW=new Int8Array(8);
+  // static evaluation from the side-to-move's point of view
+  function evaluate(){
+    minB.fill(8); maxW.fill(-1);
+    let npn=0;
+    for(let sq=0;sq<64;sq++){
+      const p=B[sq]; if(p===0) continue;
+      const a=p<0?-p:p; if(a!==1&&a!==4) continue;
+      npn++; const r=sq>>3, c=sq&7;
+      if(p>0){ if(r>maxW[c]) maxW[c]=r } else { if(r<minB[c]) minB[c]=r }
+    }
+    const wk=KS[0], bk=KS[1];
+    const wkr=wk>>3, wkc=wk&7, bkr=bk>>3, bkc=bk&7;
+    let s=0;
+    for(let sq=0;sq<64;sq++){
+      const p=B[sq]; if(p===0) continue;
+      const a=p<0?-p:p, r=sq>>3, c=sq&7;
+      if(a===2){
+        const d=Math.max(Math.abs(r-3.5),Math.abs(c-3.5));
+        const v=npn<10?-d*8:0;
+        s+=p>0?v:-v;
+      } else if(a===3){
+        const d=Math.max(Math.abs(r-3.5),Math.abs(c-3.5));
+        const v=900-d*4;
+        s+=p>0?v:-v;
+      } else if(p>0){
+        const adv=7-r; let v=100+adv*12;
+        if(c>=2&&c<=5) v+=5;
+        let passed=true;
+        for(let f=c-1;f<=c+1;f++){ if(f<0||f>7) continue; if(minB[f]<r){passed=false;break} }
+        if(passed){
+          v+=adv*adv*4+10;
+          let clear=true; for(let rr=r-1;rr>=0;rr--) if(B[rr*8+c]!==0){clear=false;break}
+          if(clear){
+            const ek=Math.max(bkr-0,Math.abs(bkc-c)), ok=Math.max(Math.abs(wkr-0),Math.abs(wkc-c));
+            if(ek>r+1+(side<0?1:0)) v+=450+adv*20;
+            v+=(ek-ok)*3;
+          }
+        }
+        s+=v;
+      } else {
+        const adv=r; let v=100+adv*12;
+        if(c>=2&&c<=5) v+=5;
+        let passed=true;
+        for(let f=c-1;f<=c+1;f++){ if(f<0||f>7) continue; if(maxW[f]>r){passed=false;break} }
+        if(passed){
+          v+=adv*adv*4+10;
+          let clear=true; for(let rr=r+1;rr<=7;rr++) if(B[rr*8+c]!==0){clear=false;break}
+          if(clear){
+            const dist=7-r;
+            const ek=Math.max(7-wkr,Math.abs(wkc-c)), ok=Math.max(Math.abs(7-bkr),Math.abs(bkc-c));
+            if(ek>dist+1+(side>0?1:0)) v+=450+adv*20;
+            v+=(ek-ok)*3;
+          }
+        }
+        s-=v;
+      }
+    }
+    return side>0?s:-s;
+  }
+
+  function qsearch(alpha,beta,ply,qd){
+    if(((++nodes)&1023)===0&&performance.now()>deadline) stop=true;
+    if(stop) return 0;
+    const ci=side>0?0:1;
+    const inChk=attacked(KS[ci],-side);
+    let best;
+    if(!inChk){
+      best=evaluate();
+      if(best>=beta) return best;
+      if(best>alpha) alpha=best;
+    } else best=-MATE+ply;
+    if(qd<=0||ply>=MAXP) return inChk?evaluate():best;
+    const n=gen(ply,!inChk), mv=MV[ply], sc=SC[ply], ek=KS[1-ci];
+    for(let i=0;i<n;i++) if(((mv[i]>>6)&63)===ek) return MATE-ply;
+    for(let i=0;i<n;i++){
+      let bi=i; for(let j=i+1;j<n;j++) if(sc[j]>sc[bi]) bi=j;
+      if(bi!==i){const tm_=mv[i];mv[i]=mv[bi];mv[bi]=tm_;const ts_=sc[i];sc[i]=sc[bi];sc[bi]=ts_}
+      const m=mv[i];
+      make(m,ply);
+      const v=-qsearch(-beta,-alpha,ply+1,qd-1);
+      unmake(m,ply);
+      if(stop) return 0;
+      if(v>best){best=v; if(v>alpha){alpha=v; if(alpha>=beta) break}}
+    }
+    return best;
+  }
+
+  function search(depth,alpha,beta,ply){
+    if(((++nodes)&1023)===0&&performance.now()>deadline) stop=true;
+    if(stop) return 0;
+    const ci=side>0?0:1;
+    if(depth<=0){
+      if(ply<MAXP-6&&attacked(KS[ci],-side)) depth=1;
+      else return qsearch(alpha,beta,ply,6);
+    }
+    const idx=h1&TTM; let ttm=0;
+    if(tk1[idx]===h1&&tk2[idx]===h2){
+      ttm=tm[idx];
+      if(td[idx]>=depth&&ply>0){
+        let v=ts[idx]; if(v>MATE-200) v-=ply; else if(v<-MATE+200) v+=ply;
+        const fg=tf[idx];
+        if(fg===1) return v;
+        if(fg===2&&v>=beta) return v;
+        if(fg===3&&v<=alpha) return v;
+      }
+    }
+    if(ply>=MAXP) return evaluate();
+    const n=gen(ply,false), mv=MV[ply], sc=SC[ply], ek=KS[1-ci];
+    for(let i=0;i<n;i++) if(((mv[i]>>6)&63)===ek) return MATE-ply;
+    if(n===0) return -MATE+ply;
+    for(let i=0;i<n;i++){
+      const m=mv[i];
+      if(m===ttm) sc[i]+=1000000; else if(m===KIL[ply]) sc[i]+=8000;
+    }
+    let best=-INF, bm=0; const a0=alpha;
+    for(let i=0;i<n;i++){
+      let bi=i; for(let j=i+1;j<n;j++) if(sc[j]>sc[bi]) bi=j;
+      if(bi!==i){const tm_=mv[i];mv[i]=mv[bi];mv[bi]=tm_;const ts_=sc[i];sc[i]=sc[bi];sc[bi]=ts_}
+      const m=mv[i];
+      make(m,ply);
+      const v=-search(depth-1,-beta,-alpha,ply+1);
+      unmake(m,ply);
+      if(stop) return 0;
+      if(v>best){best=v;bm=m; if(v>alpha){alpha=v; if(alpha>=beta){ if(B[(m>>6)&63]===0) KIL[ply]=m; break }}}
+    }
+    let sv=best; if(sv>MATE-200) sv+=ply; else if(sv<-MATE+200) sv-=ply;
+    tk1[idx]=h1; tk2[idx]=h2; td[idx]=depth; ts[idx]=sv; tm[idx]=bm;
+    tf[idx]=best<=a0?3:(best>=beta?2:1);
+    return best;
+  }
+
+  const LV={
+    1:{depth:1,noise:220,rnd:0.15,fixed:true},
+    2:{depth:4,noise:20,rnd:0,fixed:true},
+    3:{depth:40,noise:0,rnd:0,ms:1200}
+  };
+
+  function encode(c,b){
+    const f=c.from.row*8+c.from.col, t=c.to.row*8+c.to.col;
+    const p=b[c.from.row][c.from.col];
+    let fl=0;
+    if(c.m.kind==='double') fl=1; else if(c.m.kind==='enpassant') fl=2;
+    if(p&&p.type==='pawn'&&((p.color==='white'&&c.to.row===0)||(p.color==='black'&&c.to.row===7))) fl=3;
+    return f|(t<<6)|(fl<<12);
+  }
+
+  // cands: [{from,to,m}] (legal). returns index of chosen candidate.
+  function choose(b,color,epObj,cands,level,msOverride){
+    const cfg=LV[level]||LV[2], n=cands.length;
+    lastScore=0; lastDepth=0;
+    if(n<=1) return 0;
+    if(cfg.rnd&&Math.random()<cfg.rnd) return Math.floor(Math.random()*n);
+    load(b,color,epObj);
+    const enc=cands.map(c=>encode(c,b));
+    nodes=0; stop=false; KIL.fill(0);
+    const start=performance.now();
+    if(cfg.fixed){
+      deadline=start+8000;
+      let bi=0,bs=-INF;
+      for(let i=0;i<n;i++){
+        make(enc[i],0);
+        let v=-search(cfg.depth-1,-INF,INF,1);
+        unmake(enc[i],0);
+        if(stop) break;
+        v+=(Math.random()*2-1)*cfg.noise;
+        if(v>bs){bs=v;bi=i}
+      }
+      lastScore=bs; lastDepth=cfg.depth;
+      return bi;
+    }
+    const ms=msOverride||cfg.ms;
+    deadline=start+ms;
+    let order=[...Array(n).keys()], bestIdx=0, bestScore=-INF;
+    for(let depth=1;depth<=cfg.depth;depth++){
+      let alpha=-INF, curBest=-1, curScore=-INF, done=true;
+      for(let k=0;k<n;k++){
+        const i=order[k];
+        make(enc[i],0);
+        const v=-search(depth-1,-INF,-alpha,1);
+        unmake(enc[i],0);
+        if(stop){done=false;break}
+        if(v>curScore){curScore=v;curBest=i; if(v>alpha) alpha=v}
+      }
+      if(!done){ if(depth>1&&curBest>=0&&curScore>=bestScore-0){bestIdx=curBest;bestScore=curScore} break }
+      bestIdx=curBest; bestScore=curScore; lastDepth=depth;
+      order=[bestIdx,...order.filter(i=>i!==bestIdx)];
+      if(Math.abs(bestScore)>MATE-100) break;
+      if(performance.now()-start>ms*0.45) break;
+    }
+    lastScore=bestScore;
+    return bestIdx;
+  }
+
+  function reset(){ tk1.fill(0); tk2.fill(0); td.fill(0); }
+  function evalBlack(b){ load(b,'black',null); return evaluate(); }
+  return {choose,reset,evalBlack,get lastScore(){return lastScore},get lastDepth(){return lastDepth},get nodes(){return nodes},
+          _load:load,_gen:(ply,caps)=>gen(ply,caps),_MV:MV,_B:B};
+})();
+
+function evalBoard(b){ return AI.evalBlack(b); }   // positive = good for black
 function aiAcceptDraw(){
-  const s=evalBoard(board);
-  if(s<-50)return true; if(s>100)return false; return Math.random()<0.3;
+  const sc=evalBoard(board);
+  if(sc<-50)return true; if(sc>100)return false; return Math.random()<0.3;
+}
+// pick a legal move for `color` with the given strength level (1 easy, 2 medium, 3 strong)
+function aiPickMove(color,level,ms){
+  const cands=[];
+  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+    if(board[r][c]?.color!==color) continue;
+    for(const m of legalMoves(board,r,c,epTarget)) cands.push({from:{row:r,col:c},to:{row:m.row,col:m.col},m});
+  }
+  if(!cands.length) return null;
+  const pool=cands.slice();
+  for(let tries=0;tries<3&&pool.length;tries++){
+    const i=AI.choose(board,color,epTarget,pool,level,ms), cd=pool[i];
+    if(level<3||pool.length<2) return cd;
+    // when ahead, don't walk into a threefold repetition
+    const nb=applyMove(board,cd.from,cd.to,cd.m,epTarget);
+    const nep=cd.m.kind==='double'?{row:cd.from.row+(color==='white'?-1:1),col:cd.from.col}:null;
+    const key=posKey(nb,color==='white'?'black':'white',nep);
+    if((posHistory[key]||0)>=2&&AI.lastScore>80){pool.splice(i,1);continue}
+    return cd;
+  }
+  return pool[0]||cands[0];
 }
 function doAI(){
   document.getElementById('ait').classList.remove('on');
   setUI(false);
-  if(gameOver||turn!=='black') return;
-  let best=-Infinity,bFrom=null,bTo=null,bM=null;
-  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-    if(board[r][c]?.color!=='black') continue;
-    for(const m of legalMoves(board,r,c,epTarget)){
-      const nb=applyMove(board,{row:r,col:c},{row:m.row,col:m.col},m,epTarget);
-      const nep=m.kind==='double'?{row:r+1,col:c}:null;
-      const sc=minimax(nb,settings.diff===1?1:settings.diff===2?2:3,-Infinity,Infinity,false,'white',nep)+(settings.diff===1?Math.random()*150:0);
-      if(sc>best||(sc===best&&Math.random()<.15)){best=sc;bFrom={row:r,col:c};bTo={row:m.row,col:m.col};bM=m}
-    }
-  }
-  if(bFrom){execMove(bFrom,bTo,bM,true)}
+  if(gameOver||!vsAI||turn!=='black') return;
+  let ms;
+  if(settings.diff===3){ ms=1200; if(timeCtl) ms=Math.max(150,Math.min(ms,clockLeft('black')/25)) }
+  const cd=aiPickMove('black',settings.diff,ms);
+  if(cd) execMove(cd.from,cd.to,cd.m,true);
 }
 
 // ================================================================
 //  GAME FLOW
 // ================================================================
 function startGame(ai){
-  vsAI=ai; board=initBoard(); turn='white';
+  gameId++; vsAI=ai; board=initBoard(); turn='white';
   sel=null; possible=[]; lastMove=null; epTarget=null;
   gameOver=false; drawOffered=false; drawBy=null;
   fmn=1; history=[]; replayIdx=-1;
-  halfMoveClock=0; posHistory={}; finale=null; pre.length=0;
+  halfMoveClock=0; posHistory={}; pre.length=0; AI.reset();
   document.getElementById('log').innerHTML='';
   document.getElementById('ov-result').classList.remove('on');
   document.getElementById('ov-draw').classList.remove('on');
@@ -1364,7 +1683,7 @@ function startGame(ai){
   document.getElementById('game').style.display='flex';
 }
 function restartGame(){ if(online){ onlineRematch(); return }document.getElementById('ov-result').classList.remove('on');startGame(vsAI)}
-function goMenu(){clearInterval(tickT); finale=null; pre.length=0; leaveOnline();
+function goMenu(){gameId++; clearInterval(tickT); pre.length=0; leaveOnline();
   document.getElementById('game').style.display='none';
   ['ov-result','ov-draw','ov-sur'].forEach(id=>document.getElementById(id).classList.remove('on'));
   document.getElementById('menu').style.display='block';
@@ -1448,7 +1767,7 @@ function fmtClock(ms,active){
   if(active&&ms<10000) return (ms/1000).toFixed(3);
   const s=Math.ceil(ms/1000); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 }
-function clockRunning(k){return !!timeCtl&&!gameOver&&!finale&&turn===k}
+function clockRunning(k){return !!timeCtl&&!gameOver&&turn===k}
 function clockLeft(k){return clockRunning(k)?Math.max(0,clocks[k]-(performance.now()-turnStart)):Math.max(0,clocks[k])}
 function chargeClock(){
   if(!timeCtl) return;
@@ -1468,7 +1787,7 @@ function drawClocks(){
 function startClock(){
   clearInterval(tickT); turnStart=performance.now(); if(!timeCtl) return;
   tickT=setInterval(()=>{
-    if(gameOver||finale){clearInterval(tickT);return}
+    if(gameOver){clearInterval(tickT);return}
     drawClocks();
     if(clockLeft(turn)<=0&&(!online||turn===myColor)) timeOut(turn);
   },40);
@@ -1480,21 +1799,13 @@ function timeOut(k){ if(online){ if(k!==myColor&&!remoteApply) return; if(k===my
   showResult('Час вичерпано',`${k==='white'?'Чорні':'Білі'} перемагають!`,'');
 }
 // hint
-function showHint(){ if(online||finale) return;
+function showHint(){ if(online) return;
   if(gameOver||replayIdx>=0||(vsAI&&turn==='black')) return;
-  const mvs=allMoves(board,turn,epTarget); if(!mvs.length) return;
-  const maxi=turn==='black', opp=maxi?'white':'black'; let best=null, bs=maxi?-Infinity:Infinity;
-  for(const{from,to,m} of mvs){
-    const nb=applyMove(board,from,to,m,epTarget);
-    const nep=m.kind==='double'?{row:from.row+(maxi?1:-1),col:from.col}:null;
-    const sc=minimax(nb,2,-Infinity,Infinity,!maxi,opp,nep);
-    if(maxi?sc>bs:sc<bs){bs=sc;best={from,to}}
-  }
-  if(!best) return;
+  const cd=aiPickMove(turn,3,600); if(!cd) return;
   sel=null; possible=[];
   renderBoard(board,null,[],lastMove,chkTarget());
-  document.getElementById(`c${best.from.row}${best.from.col}`).classList.add('hint');
-  document.getElementById(`c${best.to.row}${best.to.col}`).classList.add('hint');
+  document.getElementById(`c${cd.from.row}${cd.from.col}`).classList.add('hint');
+  document.getElementById(`c${cd.to.row}${cd.to.col}`).classList.add('hint');
 }
 // init
 window.addEventListener('load',()=>{
@@ -1527,7 +1838,7 @@ function undoMove(){ if(online) return;
   if(gameOver||replayIdx>=0||!undoStack.length||document.getElementById('ait').classList.contains('on')) return toast('Немає що скасовувати');
   let s=undoStack.pop();
   if(vsAI){while(s.t!=='white'&&undoStack.length) s=undoStack.pop(); if(s.t!=='white') return;}
-  pre.length=0; if(finale){finale=null;setUI(false);startClock()} else if(timeCtl) turnStart=performance.now();
+  pre.length=0; if(timeCtl) turnStart=performance.now();
   board=s.b;turn=s.t;epTarget=s.ep;lastMove=s.lm;halfMoveClock=s.hm;posHistory=s.ph;fmn=s.fm;capList=s.cl;history.length=s.hl;
   const lg=document.getElementById('log'); while(lg.children.length>s.ll) lg.removeChild(lg.firstChild);
   sel=null;possible=[];
@@ -1640,9 +1951,13 @@ let noSlide=false;
 // ================================================================
 let online=false, myColor='white', remoteApply=false, peer=null, conn=null, onTime=0, rm={me:false,opp:false}, joinTimer=null, oppNick='';
 const cleanNick=x=>String(x||'').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,16);
-const nm=n=>n||'Анонім';
+const nm=n=>n||'Суперник';
 const myNickRaw=()=>cleanNick(settings.nick);
-function saveNick(){settings.nick=cleanNick(document.getElementById('on-nick').value);save()}
+function saveNick(){
+  const el=document.getElementById('on-nick'), v=cleanNick(el.value);
+  if(!v){el.classList.add('err');el.focus();toast('Введіть нікнейм, щоб грати онлайн');return false}
+  el.classList.remove('err'); settings.nick=v; save(); return true;
+}
 function updateNickLabels(){
   if(!online) return;
   const me=nm(myNickRaw())+' (ви)', op=nm(oppNick);
@@ -1652,7 +1967,7 @@ function updateNickLabels(){
 const PFX='pervisni-chess-', gid=id=>document.getElementById(id), oppOf=k=>k==='white'?'black':'white';
 function netSend(d){try{if(conn&&conn.open)conn.send(d)}catch(e){}}
 function killPeer(){clearTimeout(joinTimer);try{conn&&conn.close()}catch(e){}try{peer&&peer.destroy()}catch(e){}conn=null;peer=null}
-function openOnline(){gid('on-nick').value=settings.nick||'';gid('on-main').style.display='';gid('on-wait').style.display='none';gid('ov-online').classList.add('on')}
+function openOnline(){gid('on-nick').value=settings.nick||'';gid('on-nick').classList.remove('err');gid('on-main').style.display='';gid('on-wait').style.display='none';gid('ov-online').classList.add('on')}
 function closeOnline(){gid('ov-online').classList.remove('on');if(!online)killPeer()}
 function showWait(code,status,share){gid('on-main').style.display='none';gid('on-wait').style.display='';gid('on-code-show').textContent=code||'';gid('on-status').textContent=status;gid('on-share').style.display=share?'':'none'}
 function genCode(){return String(Math.floor(Math.random()*1000)).padStart(3,'0')}
@@ -1664,7 +1979,7 @@ function shareRoom(){
   else{try{navigator.clipboard.writeText(url);toast('Посилання скопійовано')}catch(e){prompt('Скопіюйте посилання:',url)}}
 }
 function hostRoom(){
-  if(!needPeer())return; saveNick(); oppNick=''; killPeer(); const code=genCode(); onTime=settings.time;
+  if(!saveNick())return; if(!needPeer())return; oppNick=''; killPeer(); const code=genCode(); onTime=settings.time;
   peer=new Peer(PFX+code);
   peer.on('open',()=>showWait(code,'Очікуємо суперника… Надішліть йому код або посилання.',true));
   peer.on('connection',cn=>{
@@ -1677,7 +1992,7 @@ function hostRoom(){
 function joinRoom(){
   if(!needPeer())return;
   const code=gid('on-code').value.trim().toUpperCase(); if(code.length<3) return toast('Введіть код із 3 цифр');
-  saveNick(); oppNick='';
+  if(!saveNick()) return; oppNick='';
   killPeer(); showWait(code,'Підключення…',false);
   peer=new Peer();
   peer.on('open',()=>{
@@ -1693,9 +2008,8 @@ function onNetData(d){
   const opp=oppOf(myColor);
   if(d.t==='start'&&!online){clearTimeout(joinTimer);online=true;myColor='black';onTime=+d.time||0;oppNick=cleanNick(d.nick);gid('ov-online').classList.remove('on');beginOnline(false);netSend({t:'nick',n:myNickRaw()})}
   else if(d.t==='nick'&&online){oppNick=cleanNick(d.n);updateNickLabels()}
-  else if(d.t==='fin'&&online&&finale){finishFinale()}
-  else if(d.t==='mv'&&online&&!gameOver&&turn===opp&&d.f&&d.to){
-    const m=(finale?finaleMoves(d.f.row,d.f.col):legalMoves(board,d.f.row,d.f.col,epTarget)).find(x=>x.row===d.to.row&&x.col===d.to.col);
+  else if(d.t==='mv'&&online&&!gameOver&&turn===opp&&d.f&&d.to&&[d.f.row,d.f.col,d.to.row,d.to.col].every(n=>Number.isInteger(n)&&n>=0&&n<8)){
+    const m=legalMoves(board,d.f.row,d.f.col,epTarget).find(x=>x.row===d.to.row&&x.col===d.to.col);
     if(m&&board[d.f.row][d.f.col]?.color===opp){remoteClock=(typeof d.ct==='number')?d.ct:null;remoteApply=true;execMove({row:d.f.row,col:d.f.col},{row:d.to.row,col:d.to.col},m,false);remoteApply=false}
   }
   else if(d.t==='sur'&&online&&!gameOver){surColor=opp;remoteApply=true;doSurrender();remoteApply=false}
@@ -1712,7 +2026,7 @@ function onNetClose(){
   if(!online) return;
   toast(nm(oppNick)+' відключився');
   if(!gameOver){
-    finale=null; gameOver=true; clearInterval(tickT); addLog(nm(oppNick)+' відключився','eg');
+    gameOver=true; clearInterval(tickT); addLog(nm(oppNick)+' відключився','eg');
     renderBoard(board,null,[],lastMove,null); updateUI();
     showResult('Зв’язок втрачено','Суперник залишив гру.','');
   }
@@ -1772,7 +2086,7 @@ window.addEventListener('load',()=>{
 // open a shared invite link: …/index.html#room=ABCDE
 window.addEventListener('load',()=>{
   const m=/room=(\d{3})/.exec(location.hash);
-  if(m){openOnline();gid('on-code').value=m[1];toast('Введіть нікнейм (або залиште порожнім) і натисніть «Увійти»')}
+  if(m){openOnline();gid('on-code').value=m[1];toast('Введіть нікнейм і натисніть «Увійти»')}
 });
 </script>
 </body>
