@@ -2269,7 +2269,8 @@ function eloDelta(R,O,S,acc,kind,tc){
   let d;
   if(kind==='ai'&&S>E) d=aiStake(O)*(S-E)*(0.7+0.6*a);   // gain vs AI: depends on the AI level
   else{
-    d=kFactor(R)*(S-E)*ELO_MULT;
+    const Ee=(kind==='ai'&&S===0)?Math.max(E,0.2):E;   // a loss (or surrender) vs AI always costs at least 20% of the stake
+    d=kFactor(R)*(S-Ee)*ELO_MULT;
     if(d>0) d*=0.7+0.6*a; else d*=1.3-0.6*a;           // accurate play: bigger gains, smaller losses
   }
   if(R>3000&&d>0) d*=Math.max(0.25,1-(R-3000)/600);
