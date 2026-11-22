@@ -29,12 +29,14 @@ body[data-theme=night]{--cell-l:#a3adc2;--cell-d:#4b5878}
 html{background:var(--bg);color-scheme:light dark}
 body{
   font-family:var(--sans);font-size:16px;line-height:1.45;
-  background:var(--bg);color:var(--ink);min-height:100vh;
-  display:flex;align-items:flex-start;justify-content:center;
-  padding:20px 12px 40px;overflow-x:hidden;
+  background:var(--bg);color:var(--ink);min-height:100vh;min-height:100dvh;
+  display:flex;flex-direction:column;
+  padding:20px 12px 14px;overflow-x:hidden;
   -webkit-text-size-adjust:100%;text-size-adjust:100%;font-synthesis:none;
 }
-button,input{font:inherit;color:inherit}
+#app{flex:1 0 auto;width:100%;display:flex;align-items:flex-start;justify-content:center}
+.site-foot{flex:0 0 auto;text-align:center;font-size:.78rem;color:var(--ink-2);padding:26px 0 6px;user-select:none}
+button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 *{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
@@ -45,11 +47,6 @@ button{cursor:pointer}
 .menu-sub{margin:.7em 0 2em;color:var(--ink-2);font-size:.95rem;max-width:36ch}
 .opts{display:flex;flex-direction:column;gap:12px;margin-bottom:1.8em}
 .opt-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.9rem;color:var(--ink-2)}
-.chips{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
-.chips button{padding:5px 11px;border:1px solid var(--line);border-radius:999px;background:none;color:var(--ink-2);font-size:.85rem;transition:background .15s,color .15s,border-color .15s}
-.chips button:hover{border-color:var(--ink-2)}
-.chips button.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-#recline{justify-content:flex-start;font-size:.85rem}
 .menu-btns{border-top:1px solid var(--line)}
 .menu-btn{display:block;width:100%;text-align:left;padding:16px 2px;background:none;border:0;border-bottom:1px solid var(--line);transition:padding .15s}
 .menu-btn:hover{padding-left:10px}
@@ -102,8 +99,12 @@ button{cursor:pointer}
 .cell.sel .piece{transform:scale(1.1)}
 .piece svg{width:100%;height:100%}
 
+#board,.cell{transition:transform .5s cubic-bezier(.45,.05,.25,1)}
+body.nofx #board,body.nofx .cell{transition:none}
 body.flip #board{transform:rotate(180deg)}
 body.flip .cell{transform:rotate(180deg)}
+body.flip .coord-f{flex-direction:row-reverse}
+body.flip .coord-r{flex-direction:column-reverse}
 body.flip #bn-white{order:-1}
 body.flip #bn-black{order:3}
 body.flip #replay-bar{order:4}
@@ -200,8 +201,6 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
 .menu-sub{margin:.6em auto 1.8em}
 .opts{align-items:center}
 .opt-row{flex-direction:column;justify-content:center;gap:8px;text-align:center}
-.chips{justify-content:center}
-#recline{justify-content:center}
 .menu-btns{display:flex;flex-direction:column;gap:10px;border-top:0}
 .menu-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface);text-align:center}
 .menu-btn:hover{padding-left:18px;border-color:var(--ink-2)}
@@ -233,7 +232,9 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
 .elo-next{font-size:.8rem;color:var(--ink-2);margin-bottom:14px}
 .elo-card .field-l{margin-top:2px}
 .elo-link{margin-top:10px;background:none;border:0;color:var(--accent);text-decoration:underline;text-underline-offset:3px;font-size:.88rem}
-.sel{appearance:none;-webkit-appearance:none;padding:8px 34px 8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23888' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;font-size:.88rem;color:var(--ink);max-width:100%;text-align:center;text-align-last:center}
+.dd{appearance:none;-webkit-appearance:none;padding:8px 34px 8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23888' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;font-size:.88rem;color:var(--ink);max-width:100%;text-align:center;text-align-last:center}
+.dd option,.dd optgroup{background:var(--surface);color:var(--ink)}
+.res-elo .re-bonus{display:block;color:var(--good)}
 .elo-tag{margin-left:6px;padding:0 7px;border:1px solid var(--line);border-radius:999px;font-size:.72rem;font-weight:500;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .btn-draw.cd{opacity:.45;pointer-events:none}
 .res-elo{min-height:1.2em;margin:-6px 0 16px;font-size:.88rem;color:var(--ink-2)}
@@ -255,7 +256,7 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
 .hist-empty{padding:18px 4px;color:var(--ink-2);font-size:.9rem;text-align:center}
 
 @media(max-width:620px){
-  body{padding:12px 8px 32px}
+  body{padding:12px 8px 12px}
   #game{flex-direction:column;align-items:center;gap:12px}
   .game-left{width:100%}
   .game-right{width:100%;max-width:430px;flex-direction:row;flex-wrap:wrap;gap:8px}
@@ -273,12 +274,13 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
 <body>
+<div id="app">
 
 <!-- MENU -->
 <div id="menu">
   <span class="menu-crest">♟</span>
   <h1 class="menu-title">Первісні шахи</h1>
-  <p class="menu-sub">Королі та пішні. Бета версія</p>
+  <p class="menu-sub">Королі та пішні</p>
   <section class="elo-card" aria-label="Рейтинг">
     <div class="elo-top"><span class="elo-num" id="elo-num">0</span><span class="elo-unit">ELO</span></div>
     <div class="elo-rank" id="elo-rank">Новачок</div>
@@ -289,13 +291,13 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
     <button type="button" class="elo-link" onclick="openHistory()">Історія ігор</button>
   </section>
   <div class="opts">
-    <div class="opt-row"><span>Рівень ШІ</span><select id="sel-elo" class="sel" aria-label="Рівень ШІ"></select></div>
-    <div class="opt-row"><span>Час на партію</span><div class="chips" id="ch-time"><button type="button" data-v="0">∞</button><button type="button" data-v="1">1 хв</button><button type="button" data-v="3">3 хв</button><button type="button" data-v="5">5 хв</button><button type="button" data-v="10">10 хв</button></div></div>
+    <div class="opt-row"><span>Рівень ШІ</span><select id="sel-elo" class="dd" aria-label="Рівень ШІ"></select></div>
+    <div class="opt-row"><span>Час на партію</span><select id="sel-time" class="dd" aria-label="Час на партію"></select></div>
   </div>
   <div class="menu-btns">
     <button class="menu-btn" onclick="startGame(false)">
       <span class="menu-btn-icon">⚔️</span>
-      <span class="menu-btn-text"><span class="menu-btn-title">Грати з другом</span><span class="menu-btn-desc">Грати на одному пристрої</span></span>
+      <span class="menu-btn-text"><span class="menu-btn-title">Грати з другом</span><span class="menu-btn-desc">Грати на одному пристрої, дошка повертається до гравця</span></span>
     </button>
     <button class="menu-btn" onclick="startGame(true)">
       <span class="menu-btn-icon">🤖</span>
@@ -367,6 +369,9 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
   </div>
 </div>
 
+</div>
+<footer class="site-foot">v4.1 Full. © 7-Б Учні 2026</footer>
+
 <!-- RESULT overlay -->
 <div id="ov-result" class="ov">
   <div class="ov-box">
@@ -407,9 +412,10 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
       <li>Пішень, що дійшов до кінця дошки, стає ферзем.</li>
       <li>Мат — перемога. Пату немає: хто не має безпечного ходу, той програє.</li>
       <li>Попередні ходи: поки суперник думає, можна поставити в чергу скільки завгодно своїх ходів. Фігура, що вже «походила» наперед, може так само забирати фігури суперника. Черга виконується по одному ходу, і якщо хід став неможливим, уся черга скасовується. Скасувати чергу: права кнопка миші, Esc або «Скасувати». Працює проти ШІ й онлайн.</li>
-      <li>ELO: стартовий рейтинг 0. Після кожної партії з ШІ або з людиною онлайн він змінюється залежно від результату, сили суперника та точності ваших ходів, яку рушій перевіряє після гри. Чим вищий рейтинг, тим менше очок дає перемога. Підказка чи скасування ходу роблять партію нерейтинговою, а вихід із партії зараховується як поразка. Рейтинг та історія зберігаються у вашому браузері, суперник бачить ваш рейтинг.</li>
+      <li>ELO: стартовий рейтинг 0. Після кожної партії з ШІ або з людиною онлайн він змінюється залежно від результату, сили суперника та точності ваших ходів, яку рушій перевіряє після гри. Чим слабший ШІ, тим менше ELO дає перемога над ним, а чим сильніший, тим більше (перемога над Гросмейстером дає близько +300). Чим вищий ваш рейтинг, тим менше очок дає перемога і тим більше забирає поразка. Швидкі партії дають бонус до виграного ELO: чим коротший час, тим він більший. Підказка чи скасування ходу в грі з ШІ роблять партію нерейтинговою (гра попередить вас про це), а вихід із партії зараховується як поразка. Рейтинг та історія зберігаються у вашому браузері, суперник бачить ваш рейтинг.</li>
       <li>Нічия: за згодою, за правилом 50 ходів, при триразовому повторенні позиції, а також одразу, коли на дошці лишилися самі королі — матеріалу для мату немає. Пропонувати нічию можна не частіше, ніж раз на 10 секунд.</li>
-      <li>Годинник рахує від початку вашого ходу до моменту, коли фігуру переставлено, з точністю до мілісекунди. Хто першим вичерпав час, той програє.</li>
+      <li>Годинник рахує від початку вашого ходу до моменту, коли фігуру переставлено, з точністю до мілісекунди. Хто першим вичерпав час, той програє. Режим «3 хв + 1 с» означає 3 хвилини на партію плюс 1 секунду, що додається після кожного вашого ходу.</li>
+      <li>У грі вдвох на одному пристрої дошка розвертається до того, чий зараз хід.</li>
     </ul>
     <div class="ov-btns"><button class="ov-btn ov-pri" onclick="this.closest('.ov').classList.remove('on')">Зрозуміло</button></div>
   </div>
@@ -422,9 +428,7 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
     <h2 class="ov-title">Онлайн-гра</h2>
     <div class="ov-rule"></div>
     <div id="on-main">
-      <label class="field-l" for="on-nick">Ваш нікнейм</label>
-      <input id="on-nick" class="field" maxlength="16" placeholder="Наприклад, Оля" autocomplete="off" required>
-      <p class="field-note">Нікнейм обов’язковий: його побачить суперник.</p>
+      <p class="field-note" style="margin-top:0">Ви гратимете як <b id="on-as"></b></p>
       <button class="ov-btn ov-pri" onclick="hostRoom()">Створити кімнату</button>
       <p class="on-sep">або приєднайтесь за кодом</p>
       <div class="ov-btns"><input id="on-code" class="on-inp" maxlength="3" inputmode="numeric" pattern="[0-9]*" placeholder="000" autocomplete="off" oninput="this.value=this.value.replace(/\D/g,'')"><button class="ov-btn ov-pri" onclick="joinRoom()">Увійти</button></div>
@@ -436,6 +440,18 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
       <div class="ov-btns" id="on-share"><button class="ov-btn ov-pri" onclick="shareRoom()">Поділитися посиланням</button></div>
     </div>
     <div class="ov-btns" style="margin-top:16px"><button class="ov-btn ov-sec" onclick="closeOnline()">Скасувати</button></div>
+  </div>
+</div>
+
+<!-- UNRATED / generic confirm overlay -->
+<div id="ov-conf" class="ov">
+  <div class="ov-box">
+    <h2 class="ov-title" id="conf-title">Підтвердіть</h2>
+    <p class="ov-msg" id="conf-msg"></p>
+    <div class="ov-btns">
+      <button class="ov-btn ov-pri" onclick="confirmYes()">Так, продовжити</button>
+      <button class="ov-btn ov-sec" onclick="confirmNo()">Скасувати</button>
+    </div>
   </div>
 </div>
 
@@ -1082,7 +1098,9 @@ function execMove(from,to,m,isAI=false){
   const mover=turn;
   if(timeCtl&&!remoteApply&&!freeMove&&clockLeft(mover)<=0){timeOut(mover);return}
   chargeClock();
-  if(remoteApply&&remoteClock!=null&&timeCtl) clocks[mover]=Math.max(0,Math.min(timeCtl,remoteClock));
+  if(timeCtl&&incMs) clocks[mover]+=incMs;   // increment (1+1, 1+2, 3+1)
+  // the opponent's reported clock already includes his increment
+  if(remoteApply&&remoteClock!=null&&timeCtl) clocks[mover]=Math.max(0,Math.min(timeCtl+incMs*(ownMoves(mover)+1),remoteClock));
   remoteClock=null;
   pushSnap(); if(online&&!remoteApply) netSend({t:"mv",f:{row:from.row,col:from.col},to:{row:to.row,col:to.col},ct:timeCtl?Math.round(clocks[mover]):null});
   const piece=board[from.row][from.col];
@@ -1159,11 +1177,14 @@ function finishMove(piece, isCapture, promoted, promType, isAI){
     return;
   }
 
+  // ── NO SAFE MOVE: mate/stalemate takes precedence over the 50-move and repetition draws
+  if(!hasMvs){ endByNoMoves(chk?'mate':'stalemate'); return; }
+
   // ── 50-MOVE RULE ─────────────────────────────────────────
   if(halfMoveClock>=100){
     history.push({board:snapBoard(board),from:null,to:null,turn,ep:{},check:false});
-    addLog('Нічия: правило 50 ходів','eg'); gameOver=true;
-    renderBoard(board,null,[],lastMove,null); updateUI();
+    addLog('Нічия: правило 50 ходів','eg'); gameOver=true; clearInterval(tickT);
+    renderBoard(board,null,[],lastMove,null); updateUI(); drawClocks();
     later(()=>showResult('Нічия','Правило 50 ходів: жодного взяття чи ходу пішнем','⏱'),400);
     return;
   }
@@ -1172,18 +1193,18 @@ function finishMove(piece, isCapture, promoted, promType, isAI){
   const repCount = recordPosition(board, turn, epTarget);
   if(repCount>=3){
     history.push({board:snapBoard(board),from:null,to:null,turn,ep:{},check:false});
-    addLog('Нічия: потрійне повторення','eg'); gameOver=true;
-    renderBoard(board,null,[],lastMove,null); updateUI();
+    addLog('Нічия: потрійне повторення','eg'); gameOver=true; clearInterval(tickT);
+    renderBoard(board,null,[],lastMove,null); updateUI(); drawClocks();
     later(()=>showResult('Нічия','Позиція повторилась тричі','🔄'),400);
     return;
   }
 
-  if(!hasMvs){ endByNoMoves(chk?'mate':'stalemate'); return; }
-  else if(chk){ playCheck(); markLastMove('+'); }
+  if(chk){ playCheck(); markLastMove('+'); }
 
   renderBoard(board,null,[],lastMove,chk?turn:null);
   updateUI();
   if(timeCtl) turnStart=performance.now();
+  if(!online&&!vsAI) later(()=>{if(!gameOver) syncFlip()},320);   // two players on one device: turn the board to the side to move
   if(pre.length&&pmSide()&&turn===pmSide()) later(tryPremove,200);
 
   if(vsAI&&turn==='black'&&!gameOver){
@@ -1773,8 +1794,9 @@ function startGame(ai){
   document.getElementById('ait').classList.remove('on');
   document.getElementById('replay-bar').classList.remove('on');
   resetDraw(); setUI(false);
-  capList={white:[],black:[]}; drawCaps(); undoStack=[]; gameStart=Date.now(); clearInterval(repT); repT=null;
-  timeCtl=settings.time*60000; clocks={white:timeCtl,black:timeCtl}; drawClocks(); startClock();
+  capList={white:[],black:[]}; drawCaps(); undoStack=[]; gameStart=Date.now(); clearInterval(repT); repT=null; document.getElementById('rep-play').textContent='Грати';
+  { const tc=tcInfo(settings.time); gameTc=tc.k; timeCtl=tc.b*60000; incMs=tc.i*1000; }
+  clocks={white:timeCtl,black:timeCtl}; drawClocks(); startClock();
   const bs=document.getElementById('btn-bs');
   const ws=document.getElementById('btn-ws');
   if(vsAI){
@@ -1789,6 +1811,7 @@ function startGame(ai){
   // Record starting position
   recordPosition(board, turn, epTarget);
   buildBoard();
+  syncFlip(false);
   renderBoard(board,null,[],null,null);
   updateUI();
   document.getElementById('menu').style.display='none';
@@ -1797,13 +1820,14 @@ function startGame(ai){
 function restartGame(){ if(online){ onlineRematch(); return }document.getElementById('ov-result').classList.remove('on');startGame(vsAI)}
 function goMenu(){
   if(!gameOver&&abandonCheck()===false) return;
-  gameId++; clearInterval(tickT); pre.length=0; leaveOnline();
+  gameId++; clearInterval(tickT); pre.length=0; leaveOnline(); document.body.classList.remove('flip');
   document.getElementById('game').style.display='none';
-  ['ov-result','ov-draw','ov-sur'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  ['ov-result','ov-draw','ov-sur','ov-conf'].forEach(id=>document.getElementById(id).classList.remove('on')); confirmCb=null;
   document.getElementById('menu').style.display='block';
 }
 function showResult(title,msg,icon=''){
   pre.length=0; sel=null; possible=[]; updatePreInfo();
+  document.getElementById('ov-conf').classList.remove('on'); confirmCb=null;
   document.getElementById('res-icon').textContent=icon;
   document.getElementById('res-title').textContent=title;
   document.getElementById('res-msg').textContent=msg;
@@ -1844,13 +1868,28 @@ window.addEventListener('load',resize);
 // ================================================================
 //  v2: settings, clocks, captures, hint, themes, animation
 // ================================================================
-let animPending=false, capList={white:[],black:[]}, clocks={white:0,black:0}, timeCtl=0, tickT=null, lastTick=0, toastT=null;
-const settings=Object.assign({diff:2,time:0,theme:'classic',sound:true},(()=>{try{return JSON.parse(localStorage.getItem('pc_set')||'{}')}catch(e){return{}}})());
+let animPending=false, capList={white:[],black:[]}, clocks={white:0,black:0}, timeCtl=0, incMs=0, gameTc='0', tickT=null, lastTick=0, toastT=null;
+// ---- v4.1: data reset. Ratings saved by earlier beta builds (keys pc_elo / pc_rec) are deleted and never read;
+//      this build stores ratings under a new key (pc41_elo), so every player starts again from 0 ELO.
+try{localStorage.removeItem('pc_elo');localStorage.removeItem('pc_rec')}catch(e){}
+// ---- time controls: key "B" = B minutes, key "B+I" = B minutes + I seconds added after every move.
+//      p = extra share of won ELO for playing a fast game (faster = bigger)
+const TC_GROUPS=[
+  ['',[['0','∞ Без обмеження',0,0,0]]],
+  ['Куля',[['1','1 хв',1,0,.45],['1+1','1 хв + 1 с',1,1,.40],['1+2','1 хв + 2 с',1,2,.35]]],
+  ['Бліц',[['3','3 хв',3,0,.30],['3+1','3 хв + 1 с',3,1,.25],['5','5 хв',5,0,.20]]],
+  ['Рапід',[['10','10 хв',10,0,.12],['15','15 хв',15,0,.08],['20','20 хв',20,0,.04],['30','30 хв',30,0,0]]]
+];
+const TC={};
+TC_GROUPS.forEach(([g,items])=>items.forEach(([k,l,b,i,p])=>{TC[k]={k,l,b,i,p,g}}));
+const tcInfo=k=>TC[String(k)]||TC['0'];
+const settings=Object.assign({diff:2,time:'0',theme:'classic',sound:true},(()=>{try{return JSON.parse(localStorage.getItem('pc_set')||'{}')}catch(e){return{}}})());
 if(!(+settings.elo>=200)) settings.elo={1:400,2:1200,3:2600}[settings.diff]||800;
 settings.elo=Math.max(200,Math.min(3200,Math.round(settings.elo/200)*200));
-const ELO=(()=>{let d={};try{d=JSON.parse(localStorage.getItem('pc_elo')||'{}')}catch(e){}
+settings.time=tcInfo(settings.time).k;   // old builds stored a number of minutes
+const ELO=(()=>{let d={};try{d=JSON.parse(localStorage.getItem('pc41_elo')||'{}')}catch(e){}
   return {elo:Math.max(0,Math.min(3500,+d.elo||0)),hist:Array.isArray(d.hist)?d.hist.slice(-200):[]}})();
-function saveElo(){try{localStorage.setItem('pc_elo',JSON.stringify(ELO))}catch(e){}}
+function saveElo(){try{localStorage.setItem('pc41_elo',JSON.stringify(ELO))}catch(e){}}
 const THEMES=[['classic','Шавлія'],['wood','Дерево'],['ice','Крига'],['night','Ніч']];
 function save(){try{localStorage.setItem('pc_set',JSON.stringify(settings))}catch(e){}}
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),1600)}
@@ -1920,6 +1959,7 @@ function timeOut(k){ if(online){ if(k!==myColor&&!remoteApply) return; if(k===my
 // hint
 function showHint(){ if(online) return;
   if(gameOver||replayIdx>=0||(vsAI&&turn==='black')) return;
+  if(!unratedGate('Підказка',showHint)) return;
   const cd=aiPickMove(turn,3200,600); if(!cd) return;
   assisted=true;
   sel=null; possible=[];
@@ -1935,13 +1975,13 @@ window.addEventListener('load',()=>{
     const ck=document.createElement('span'); ck.className='clk'; ck.id='ck-'+k; ck.style.display='none';
     bn.insertBefore(caps,d); bn.insertBefore(ck,d);
   });
-  document.querySelectorAll('.chips').forEach(g=>{
-    const key='time';
-    [...g.children].forEach(b=>{
-      b.classList.toggle('on',String(settings[key])===b.dataset.v);
-      b.onclick=()=>{settings[key]=+b.dataset.v;[...g.children].forEach(x=>x.classList.toggle('on',x===b));save()};
-    });
+  const st=document.getElementById('sel-time');
+  TC_GROUPS.forEach(([g,items])=>{
+    let host=st; if(g){host=document.createElement('optgroup');host.label=g;st.appendChild(host)}
+    items.forEach(([k,l])=>{const o=document.createElement('option');o.value=k;o.textContent=l;host.appendChild(o)});
   });
+  st.value=settings.time;
+  st.addEventListener('change',()=>{settings.time=tcInfo(st.value).k;save()});
   muted=!settings.sound; applyTheme(); syncSnd();
 });
 
@@ -1949,29 +1989,25 @@ window.addEventListener('load',()=>{
 //  v3: undo, eval bar, stats, autoplay replay, hotkeys, confetti
 // ================================================================
 let undoStack=[], gameStart=Date.now(), repT=null;
-const rec=Object.assign({w:0,l:0,d:0},(()=>{try{return JSON.parse(localStorage.getItem('pc_rec')||'{}')}catch(e){return{}}})());
 function pushSnap(){
   undoStack.push({b:snapBoard(board),t:turn,ep:epTarget?{...epTarget}:null,lm:lastMove,hm:halfMoveClock,ph:{...posHistory},fm:fmn,
     cl:{white:[...capList.white],black:[...capList.black]},hl:history.length,ll:document.getElementById('log').children.length});
 }
 function undoMove(){ if(online) return;
   if(gameOver||replayIdx>=0||!undoStack.length||document.getElementById('ait').classList.contains('on')) return toast('Немає що скасовувати');
+  if(!unratedGate('Скасування ходу',undoMove)) return;
   let s=undoStack.pop();
   if(vsAI){while(s.t!=='white'&&undoStack.length) s=undoStack.pop(); if(s.t!=='white') return;}
   assisted=true; pre.length=0; if(timeCtl) turnStart=performance.now();
   board=s.b;turn=s.t;epTarget=s.ep;lastMove=s.lm;halfMoveClock=s.hm;posHistory=s.ph;fmn=s.fm;capList=s.cl;history.length=s.hl;
   const lg=document.getElementById('log'); while(lg.children.length>s.ll) lg.removeChild(lg.firstChild);
   sel=null;possible=[];
-  renderBoard(board,null,[],lastMove,chkTarget()); updateUI(); drawCaps(); toast('Хід скасовано');
+  renderBoard(board,null,[],lastMove,chkTarget()); updateUI(); drawCaps(); syncFlip();
+  toast(vsAI?'Хід скасовано. Партія нерейтингова':'Хід скасовано');
 }
 function updateEval(){
   const e=document.getElementById('evw'); if(!e||!board.length) return;
   e.style.width=(50-50*Math.tanh(evalBoard(board)/500)).toFixed(1)+'%';
-}
-function showRec(){
-  let r=document.getElementById('recline');
-  if(!r){r=document.createElement('div');r.id='recline';r.className='opt-row';document.querySelector('.opts').appendChild(r)}
-  r.textContent=`Проти ШІ: перемог ${rec.w}, нічиїх ${rec.d}, поразок ${rec.l}`;
 }
 function confetti(){
   const cols=['#2f6a86','#7db4cf','#e4c44a','#8fa28f','#d9d6cc'];
@@ -1983,11 +2019,6 @@ function confetti(){
   }
 }
 function onResult(title,msg){
-  if(vsAI){
-    if(/Білі перемагають/.test(msg)) rec.w++; else if(/Чорні перемагають/.test(msg)) rec.l++; else rec.d++;
-    try{localStorage.setItem('pc_rec',JSON.stringify(rec))}catch(e){}
-    showRec();
-  }
   const dur=Math.round((Date.now()-gameStart)/1000);
   document.getElementById('res-stats').textContent=`Ходів: ${Math.max(1,fmn-1)}, час ${fmt(dur)}`;
   const w=/Білі перемагають/.test(msg)?'white':/Чорні перемагають/.test(msg)?'black':null;
@@ -2005,12 +2036,11 @@ function replayAuto(){
   },900);
 }
 document.addEventListener('keydown',e=>{
-  if(document.getElementById('game').style.display==='none'||e.target.tagName==='INPUT') return;
+  if(document.getElementById('game').style.display==='none'||e.target.tagName==='INPUT'||document.querySelector('.ov.on')) return;
   if(e.key==='Escape'){ if(pre.length) clearPre(); else {sel=null;possible=[];redrawBoard()} return }
   if(replayIdx>=0){ if(e.key==='ArrowLeft')replayStep(-1); else if(e.key==='ArrowRight')replayStep(1); return }
   if(e.code==='KeyZ')undoMove(); else if(e.code==='KeyH')showHint(); else if(e.code==='KeyM')toggleSound(); else if(e.code==='KeyT')cycleTheme();
 });
-window.addEventListener('load',showRec);
 document.getElementById('board').addEventListener('contextmenu',e=>{e.preventDefault();if(pre.length) clearPre(); else if(sel){sel=null;possible=[];redrawBoard()}});
 
 // ================================================================
@@ -2075,10 +2105,10 @@ let online=false, myColor='white', remoteApply=false, peer=null, conn=null, onTi
 const cleanNick=x=>String(x||'').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,16);
 const nm=n=>n||'Суперник';
 const myNickRaw=()=>cleanNick(settings.nick);
-function saveNick(){
-  const el=document.getElementById('on-nick'), v=cleanNick(el.value);
-  if(!v){el.classList.add('err');el.focus();toast('Введіть нікнейм, щоб грати онлайн');return false}
-  el.classList.remove('err'); settings.nick=v; save(); return true;
+function needNick(){
+  if(cleanNick(settings.nick)) return true;
+  closeOnline(); const el=document.getElementById('menu-nick');
+  el.classList.add('err'); el.focus(); toast('Спочатку введіть нікнейм у головному меню'); return false;
 }
 function updateNickLabels(){
   if(!online) return;
@@ -2086,10 +2116,10 @@ function updateNickLabels(){
   setLabel('lbl-white',myColor==='white'?me:op,myColor==='white'?ELO.elo:oppElo);
   setLabel('lbl-black',myColor==='black'?me:op,myColor==='black'?ELO.elo:oppElo);
 }
-const PFX='pervisni-chess-', gid=id=>document.getElementById(id), oppOf=k=>k==='white'?'black':'white';
+const PFX='pervisni-chess41-', gid=id=>document.getElementById(id), oppOf=k=>k==='white'?'black':'white';
 function netSend(d){try{if(conn&&conn.open)conn.send(d)}catch(e){}}
 function killPeer(){clearTimeout(joinTimer);try{conn&&conn.close()}catch(e){}try{peer&&peer.destroy()}catch(e){}conn=null;peer=null}
-function openOnline(){gid('on-nick').value=settings.nick||'';gid('on-nick').classList.remove('err');gid('on-main').style.display='';gid('on-wait').style.display='none';gid('ov-online').classList.add('on')}
+function openOnline(){if(!needNick())return;gid('on-as').textContent=cleanNick(settings.nick);gid('on-main').style.display='';gid('on-wait').style.display='none';gid('ov-online').classList.add('on')}
 function closeOnline(){gid('ov-online').classList.remove('on');if(!online)killPeer()}
 function showWait(code,status,share){gid('on-main').style.display='none';gid('on-wait').style.display='';gid('on-code-show').textContent=code||'';gid('on-status').textContent=status;gid('on-share').style.display=share?'':'none'}
 function genCode(){return String(Math.floor(Math.random()*1000)).padStart(3,'0')}
@@ -2101,7 +2131,7 @@ function shareRoom(){
   else{try{navigator.clipboard.writeText(url);toast('Посилання скопійовано')}catch(e){prompt('Скопіюйте посилання:',url)}}
 }
 function hostRoom(){
-  if(!saveNick())return; if(!needPeer())return; oppNick=''; oppElo=0; killPeer(); const code=genCode(); onTime=settings.time;
+  if(!needNick())return; if(!needPeer())return; oppNick=''; oppElo=0; killPeer(); const code=genCode(); onTime=settings.time;
   peer=new Peer(PFX+code);
   peer.on('open',()=>showWait(code,'Очікуємо суперника… Надішліть йому код або посилання.',true));
   peer.on('connection',cn=>{
@@ -2114,7 +2144,7 @@ function hostRoom(){
 function joinRoom(){
   if(!needPeer())return;
   const code=gid('on-code').value.trim().toUpperCase(); if(code.length<3) return toast('Введіть код із 3 цифр');
-  if(!saveNick()) return; oppNick=''; oppElo=0;
+  if(!needNick()) return; oppNick=''; oppElo=0;
   killPeer(); showWait(code,'Підключення…',false);
   peer=new Peer();
   peer.on('open',()=>{
@@ -2128,7 +2158,7 @@ function hookConn(){conn.on('data',onNetData);conn.on('close',onNetClose);conn.o
 function onNetData(d){
   if(!d||typeof d!=='object') return;
   const opp=oppOf(myColor);
-  if(d.t==='start'&&!online){clearTimeout(joinTimer);online=true;myColor='black';onTime=+d.time||0;oppNick=cleanNick(d.nick);oppElo=Math.max(0,Math.min(3500,+d.elo||0));gid('ov-online').classList.remove('on');beginOnline(false);netSend({t:'nick',n:myNickRaw(),elo:ELO.elo})}
+  if(d.t==='start'&&!online){clearTimeout(joinTimer);online=true;myColor='black';onTime=tcInfo(d.time).k;oppNick=cleanNick(d.nick);oppElo=Math.max(0,Math.min(3500,+d.elo||0));gid('ov-online').classList.remove('on');beginOnline(false);netSend({t:'nick',n:myNickRaw(),elo:ELO.elo})}
   else if(d.t==='nick'&&online){oppNick=cleanNick(d.n);oppElo=Math.max(0,Math.min(3500,+d.elo||0));updateNickLabels()}
   else if(d.t==='elo'&&online){oppElo=Math.max(0,Math.min(3500,+d.e||0));updateNickLabels()}
   else if(d.t==='mv'&&online&&!gameOver&&turn===opp&&d.f&&d.to&&[d.f.row,d.f.col,d.to.row,d.to.col].every(n=>Number.isInteger(n)&&n>=0&&n<8)){
@@ -2159,12 +2189,11 @@ function beginOnline(swap){
   if(swap) myColor=oppOf(myColor);
   rm={me:false,opp:false};
   const old=settings.time; settings.time=onTime; startGame(false); settings.time=old;
-  document.body.classList.add('online'); document.body.classList.toggle('flip',myColor==='black');
+  document.body.classList.add('online');   // the board orientation is set by syncFlip() inside startGame
   const ws=gid('btn-ws'), bs=gid('btn-bs');
   ws.style.display=myColor==='white'?'':'none'; bs.style.display=myColor==='black'?'':'none';
   (myColor==='white'?ws:bs).textContent='Здатися';
   updateNickLabels();
-  if(myColor==='black') for(const id of ['cr','cf']){const e=gid(id);[...e.children].reverse().forEach(x=>e.appendChild(x))}
   ensureChat();
   addLog(`Онлайн-партія. Ви граєте ${myColor==='white'?'білими':'чорними'}.`,'eg');
 }
@@ -2210,7 +2239,7 @@ window.addEventListener('load',()=>{
 // open a shared invite link: …/index.html#room=ABCDE
 window.addEventListener('load',()=>{
   const m=/room=(\d{3})/.exec(location.hash);
-  if(m){openOnline();gid('on-code').value=m[1];toast('Введіть нікнейм і натисніть «Увійти»')}
+  if(m){gid('on-code').value=m[1]; if(cleanNick(settings.nick)){openOnline();toast('Натисніть «Увійти», щоб приєднатися')} else needNick()}
 });
 
 // ================================================================
@@ -2230,33 +2259,43 @@ function updateEloCard(){
   document.getElementById('elo-fill').style.width=Math.min(100,Math.max(0,(R-lo)/(nxt[0]-lo)*100))+'%';
   document.getElementById('elo-next').textContent=R>=3200?'Ви на вершині рейтингу':`До рівня «${nxt[1]}»: ${nxt[0]-R}`;
 }
-function eloDelta(R,O,S,acc){
-  const E=1/(1+Math.pow(10,(O-R)/400));
-  const K=14+106*Math.pow(Math.max(0,1-R/3000),2);   // 120 at 0 ... ~14 near 3000
-  let d=K*(S-E);
-  const a=acc==null?0.6:acc;
-  if(d>0) d*=0.7+0.6*a; else d*=1.3-0.6*a;           // accurate play: bigger gains, smaller losses
+const ELO_MULT=1.5;   // v4.1: every ELO gain and loss is multiplied by 1.5 (100 -> 150, -30 -> -45)
+const expScore=(R,O)=>1/(1+Math.pow(10,(O-R)/400));
+const kFactor=R=>14+106*Math.pow(Math.max(0,1-R/3000),2);   // 120 at 0 ... ~14 near 3000
+// What a win over the AI of this level is worth: weak AI = little, strong AI = a lot (Grandmaster 2600 = 300)
+const aiStake=O=>300*Math.pow(O/2600,1.2);
+function eloDelta(R,O,S,acc,kind,tc){
+  const E=expScore(R,O), a=acc==null?0.6:acc;
+  let d;
+  if(kind==='ai'&&S>E) d=aiStake(O)*(S-E)*(0.7+0.6*a);   // gain vs AI: depends on the AI level
+  else{
+    d=kFactor(R)*(S-E)*ELO_MULT;
+    if(d>0) d*=0.7+0.6*a; else d*=1.3-0.6*a;           // accurate play: bigger gains, smaller losses
+  }
   if(R>3000&&d>0) d*=Math.max(0.25,1-(R-3000)/600);
   d=Math.round(d);
   if(S===1&&d<1) d=1;
   if(S===0&&d>-1) d=-1;
-  return d;
+  let bonus=0;                                           // fast games: extra share of what was won
+  if(d>0){const p=tcInfo(tc).p; if(p>0){bonus=Math.max(1,Math.round(d*p)); d+=bonus}}
+  return {d,bonus};
 }
 function rateCtx(){
-  if(online) return {kind:'online',color:myColor,oppName:nm(oppNick),oppElo:oppElo};
-  if(vsAI) return {kind:'ai',color:'white',oppName:'ШІ',oppElo:settings.elo};
+  if(online) return {kind:'online',color:myColor,oppName:nm(oppNick),oppElo:oppElo,tc:gameTc};
+  if(vsAI) return {kind:'ai',color:'white',oppName:'ШІ',oppElo:settings.elo,tc:gameTc};
   return null;
 }
 function applyRating(ctx,outcome,acc,extra){
   const R=ELO.elo, S=outcome==='win'?1:outcome==='draw'?.5:0;
-  const after=Math.max(0,Math.min(3500,R+eloDelta(R,ctx.oppElo,S,acc)));
+  const dd=eloDelta(R,ctx.oppElo,S,acc,ctx.kind,ctx.tc);
+  const after=Math.max(0,Math.min(3500,R+dd.d));
   ELO.elo=after;
-  ELO.hist.push(Object.assign({t:Date.now(),kind:ctx.kind,opp:ctx.oppName,oppElo:ctx.oppElo,res:outcome==='win'?'W':outcome==='draw'?'D':'L',d:after-R,after,acc:acc==null?null:Math.round(acc*100)},extra||{}));
+  ELO.hist.push(Object.assign({t:Date.now(),kind:ctx.kind,opp:ctx.oppName,oppElo:ctx.oppElo,res:outcome==='win'?'W':outcome==='draw'?'D':'L',d:after-R,after,acc:acc==null?null:Math.round(acc*100),tc:ctx.tc,sp:dd.bonus},extra||{}));
   if(ELO.hist.length>200) ELO.hist.splice(0,ELO.hist.length-200);
   saveElo(); updateEloCard();
   if(online){updateNickLabels(); if(conn&&conn.open) netSend({t:'elo',e:after})}
   else if(vsAI) setLabel('lbl-white','Ви',after);
-  return {before:R,after,delta:after-R};
+  return {before:R,after,delta:after-R,bonus:dd.bonus};
 }
 function ownMoves(color){return history.filter(f=>f.from&&f.turn===color).length}
 function abandonCheck(){
@@ -2328,6 +2367,7 @@ function startRating(title,msg){
     const sub=document.createElement('span');
     sub.textContent=acc==null?'Усі ходи були вимушеними.':`Точність ${Math.round(acc*100)}%, неточностей ${res.mistakes}, грубих помилок ${res.blunders}`;
     box.appendChild(sub);
+    if(r.bonus>0){const bn=document.createElement('span');bn.className='re-bonus';bn.textContent=`Бонус за швидку партію: +${r.bonus}`;box.appendChild(bn)}
   });
 }
 
@@ -2359,7 +2399,7 @@ function openHistory(){
     hd.textContent=(x.d>0?'+':'')+x.d;
     const hs=document.createElement('span'); hs.className='hs';
     const dt=new Date(x.t).toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-    hs.textContent=[dt,x.kind==='online'?'онлайн':'проти ШІ',x.acc!=null?`точність ${x.acc}%`:(x.note||'')].filter(Boolean).join(', ');
+    hs.textContent=[dt,x.kind==='online'?'онлайн':'проти ШІ',x.acc!=null?`точність ${x.acc}%`:(x.note||''),x.tc&&x.tc!=='0'?tcInfo(x.tc).l:'',x.sp?`бонус +${x.sp}`:''].filter(Boolean).join(', ');
     const he=document.createElement('span'); he.className='he'; he.textContent='ELO '+x.after;
     row.append(hm,hd,hs,he); list.appendChild(row);
   });
@@ -2369,22 +2409,47 @@ function closeHistory(){document.getElementById('ov-hist').classList.remove('on'
 
 // ---- nickname: saved while typing, restored on every visit
 function syncNickInputs(from){
-  const v=from.value;
-  settings.nick=cleanNick(v); save();
-  ['menu-nick','on-nick'].forEach(id=>{const e=document.getElementById(id); if(e&&e!==from) e.value=v});
+  settings.nick=cleanNick(from.value); save(); from.classList.remove('err');
 }
 window.addEventListener('load',()=>{
-  ['menu-nick','on-nick'].forEach(id=>{
-    const e=document.getElementById(id); if(!e) return;
+  { const e=document.getElementById('menu-nick');
     e.value=settings.nick||'';
-    e.addEventListener('input',()=>syncNickInputs(e));
-  });
+    e.addEventListener('input',()=>syncNickInputs(e)); }
   const sel=document.getElementById('sel-elo');
   AI.LEVELS.forEach(l=>{const o=document.createElement('option');o.value=l.elo;o.textContent=`${l.elo} ELO, ${l.name}`;sel.appendChild(o)});
   sel.value=settings.elo;
   sel.addEventListener('change',()=>{settings.elo=+sel.value;save()});
   updateEloCard();
 });
+
+// ================================================================
+//  v4.1: board orientation, "unrated" confirmation
+// ================================================================
+// Two players on one device: the board is turned to the player whose move it is. Online: always towards my colour.
+function wantFlip(){ return online ? myColor==='black' : (!vsAI && turn==='black') }
+function syncFlip(anim){
+  const b=document.body, f=wantFlip();
+  if(b.classList.contains('flip')===f) return;
+  if(anim===false){
+    b.classList.add('nofx'); b.classList.toggle('flip',f);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>b.classList.remove('nofx')));
+  } else b.classList.toggle('flip',f);
+}
+let confirmCb=null;
+function askConfirm(title,msg,cb){
+  confirmCb=cb; document.getElementById('conf-title').textContent=title; document.getElementById('conf-msg').textContent=msg;
+  document.getElementById('ov-conf').classList.add('on');
+}
+function confirmYes(){const cb=confirmCb;confirmCb=null;document.getElementById('ov-conf').classList.remove('on');if(cb)cb()}
+function confirmNo(){confirmCb=null;document.getElementById('ov-conf').classList.remove('on')}
+// true = go ahead now; false = a confirmation was shown, `fn` is called again once the player agrees
+function unratedGate(what,fn){
+  if(!vsAI||assisted) return true;
+  const id=gameId;
+  askConfirm('Партія стане нерейтинговою',`${what} зробить цю партію проти ШІ нерейтинговою: ELO за неї не зміниться ні за перемогу, ні за поразку. Продовжити?`,
+    ()=>{ if(id!==gameId||gameOver||replayIdx>=0) return; assisted=true; fn(); });
+  return false;
+}
 </script>
 </body>
 </html>
