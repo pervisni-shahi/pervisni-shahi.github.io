@@ -1063,8 +1063,10 @@ function onCell(r,c){
     const m=possible.find(mv=>mv.row===r&&mv.col===c);
     if(m){
       if(pm){pre.push({from:{row:sel.row,col:sel.col},to:{row:r,col:c}});sel=null;possible=[];redrawBoard();return}
+      const lm=selMoves(sel.row,sel.col).find(mv=>mv.row===r&&mv.col===c);   // re-check: the selection may be older than the AI's last move
+      if(!lm){sel=null;possible=[];redrawBoard();return}
       pre.length=0;
-      execMove(sel,{row:r,col:c},m);sel=null;possible=[];return;
+      execMove(sel,{row:r,col:c},lm);sel=null;possible=[];return;
     }
     if(p?.color===who){sel={row:r,col:c};possible=movesOf(r,c)}
     else{sel=null;possible=[]}
@@ -1169,6 +1171,7 @@ function finishMove(piece, isCapture, promoted, promType, isAI){
   else playMove();
 
   // ── INSUFFICIENT MATERIAL: only kings left ───────────────
+  if(!findKing(board,turn)){ endByNoMoves('mate'); return; }   // safety: a side without a king has lost
   if(onlyKings(board)){
     history.push({board:snapBoard(board),from:null,to:null,turn,ep:{},check:false});
     addLog('Нічия: на дошці лишилися самі королі','eg'); gameOver=true; pre.length=0; clearInterval(tickT);
@@ -2259,12 +2262,12 @@ function updateEloCard(){
   document.getElementById('elo-fill').style.width=Math.min(100,Math.max(0,(R-lo)/(nxt[0]-lo)*100))+'%';
   document.getElementById('elo-next').textContent=R>=3200?'Ви на вершині рейтингу':`До рівня «${nxt[1]}»: ${nxt[0]-R}`;
 }
-const ELO_MULT=1.5;   // v4.1: every ELO gain and loss is multiplied by 1.5 (100 -> 150, -30 -> -45)
+const ELO_MULT=1;   // v4.1: every ELO gain and loss is multiplied by 1.5 (100 -> 150, -30 -> -45)
 const expScore=(R,O)=>1/(1+Math.pow(10,(O-R)/400));
 const kFactor=R=>14+106*Math.pow(Math.max(0,1-R/3000),2);   // 120 at 0 ... ~14 near 3000
 // What a win over the AI of this level is worth: weak AI = little, strong AI = a lot (Grandmaster 2600 = 300)
 const aiStake=O=>300*Math.pow(O/2600,1.2);
-function eloDelta(R,O,S,acc,kind,tc){
+function eloDelta(R,O,S,acc,kind,tc,scale){
   const E=expScore(R,O), a=acc==null?0.6:acc;
   let d;
   if(kind==='ai'&&S>E) d=aiStake(O)*(S-E)*(0.7+0.6*a);   // gain vs AI: depends on the AI level
@@ -2273,6 +2276,8 @@ function eloDelta(R,O,S,acc,kind,tc){
     d=kFactor(R)*(S-Ee)*ELO_MULT;
     if(d>0) d*=0.7+0.6*a; else d*=1.3-0.6*a;           // accurate play: bigger gains, smaller losses
   }
+  if(d>0) d/=1+R/1500;                       // the higher your rating, the less a win gives (R=1500: half, R=3000: a third)
+  d*=(scale==null?1:scale);                  // stalemate counts for 75%
   if(R>3000&&d>0) d*=Math.max(0.25,1-(R-3000)/600);
   d=Math.round(d);
   if(S===1&&d<1) d=1;
@@ -2288,7 +2293,7 @@ function rateCtx(){
 }
 function applyRating(ctx,outcome,acc,extra){
   const R=ELO.elo, S=outcome==='win'?1:outcome==='draw'?.5:0;
-  const dd=eloDelta(R,ctx.oppElo,S,acc,ctx.kind,ctx.tc);
+  const dd=eloDelta(R,ctx.oppElo,S,acc,ctx.kind,ctx.tc,ctx.scale);
   const after=Math.max(0,Math.min(3500,R+dd.d));
   ELO.elo=after;
   ELO.hist.push(Object.assign({t:Date.now(),kind:ctx.kind,opp:ctx.oppName,oppElo:ctx.oppElo,res:outcome==='win'?'W':outcome==='draw'?'D':'L',d:after-R,after,acc:acc==null?null:Math.round(acc*100),tc:ctx.tc,sp:dd.bonus},extra||{}));
@@ -2304,7 +2309,7 @@ function abandonCheck(){
   if(ownMoves(ctx.color)<3) return true;
   if(!confirm('Вийти з партії? Її буде зараховано як поразку.')) return false;
   ratedId=gameId;
-  const r=applyRating(ctx,'loss',null,{note:'вихід'});
+  const r=applyRating(ctx,'loss',0.45,{note:'вихід'});
   toast(`ELO ${r.delta>0?'+':''}${r.delta}`);
   return true;
 }
@@ -2345,6 +2350,7 @@ function startRating(title,msg){
   const box=document.getElementById('res-elo'); if(!box) return;
   box.textContent=''; box.className='res-elo';
   const ctx=rateCtx(); if(!ctx) return;
+  if(title==='Пат') ctx.scale=0.75;
   const note=t=>{box.textContent=t};
   if(ratedId===gameId) return;
   if(title==='Зв’язок втрачено') return note('Партія нерейтингова: зв’язок втрачено.');
@@ -2358,7 +2364,8 @@ function startRating(title,msg){
   note('Аналізуємо ваші ходи…');
   analyzeMoves(frames,ctx.color,p=>{if(gid_===gameId&&ratedId===gid_&&!box.dataset.done) note(`Аналізуємо ваші ходи… ${Math.round(p*100)}%`)},res=>{
     const acc=res.n?res.sum/res.n:null;
-    const r=applyRating(ctx,outcome,acc,{moves:ownMoves(ctx.color),bl:res.blunders});
+    const accR=(title==='Здача'&&outcome==='loss')?0.45:acc;   // a surrender costs about as much as a mate
+    const r=applyRating(ctx,outcome,accR,{moves:ownMoves(ctx.color),bl:res.blunders});
     if(gid_!==gameId) return;
     box.textContent='';
     const main=document.createElement('span'); main.className='re-main';
