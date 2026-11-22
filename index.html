@@ -235,6 +235,15 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
 .dd{appearance:none;-webkit-appearance:none;padding:8px 34px 8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23888' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;font-size:.88rem;color:var(--ink);max-width:100%;text-align:center;text-align-last:center}
 .dd option,.dd optgroup{background:var(--surface);color:var(--ink)}
 .res-elo .re-bonus{display:block;color:var(--good)}
+.elo-card{position:relative}
+.elo-arrow{position:absolute;top:8px;right:8px;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;background:none;color:var(--ink-2);line-height:1;transition:transform .2s,border-color .15s}
+.elo-arrow:hover{border-color:var(--ink-2)}
+.elo-arrow.open{transform:rotate(180deg)}
+.elo-ranks{margin-top:12px;border-top:1px solid var(--line);text-align:left}
+.elo-ranks[hidden]{display:none}
+.er{display:flex;justify-content:space-between;gap:8px;padding:6px 6px;font-size:.85rem;color:var(--ink-2);border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.er.me{color:var(--ink);font-weight:600;background:rgba(127,127,127,.12);border-radius:6px}
+.ttl{margin-left:6px;padding:0 6px;border-radius:5px;background:var(--accent);color:var(--bg);font-size:.7rem;font-weight:700;letter-spacing:.04em}
 .elo-tag{margin-left:6px;padding:0 7px;border:1px solid var(--line);border-radius:999px;font-size:.72rem;font-weight:500;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .btn-draw.cd{opacity:.45;pointer-events:none}
 .res-elo{min-height:1.2em;margin:-6px 0 16px;font-size:.88rem;color:var(--ink-2)}
@@ -282,6 +291,7 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
   <h1 class="menu-title">Первісні шахи</h1>
   <p class="menu-sub">Королі та пішні</p>
   <section class="elo-card" aria-label="Рейтинг">
+    <button type="button" class="elo-arrow" id="elo-arrow" aria-expanded="false" aria-label="Титули за ELO" title="Титули за ELO" onclick="toggleRanks()">▾</button>
     <div class="elo-top"><span class="elo-num" id="elo-num">0</span><span class="elo-unit">ELO</span></div>
     <div class="elo-rank" id="elo-rank">Новачок</div>
     <div class="elo-bar"><i id="elo-fill"></i></div>
@@ -289,6 +299,7 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
     <label class="field-l" for="menu-nick">Нікнейм</label>
     <input id="menu-nick" class="field" maxlength="16" placeholder="Введіть нікнейм" autocomplete="off">
     <button type="button" class="elo-link" onclick="openHistory()">Історія ігор</button>
+    <div class="elo-ranks" id="elo-ranks" hidden></div>
   </section>
   <div class="opts">
     <div class="opt-row"><span>Рівень ШІ</span><select id="sel-elo" class="dd" aria-label="Рівень ШІ"></select></div>
@@ -571,12 +582,12 @@ function pieceSVG(type, color) {
 let AC = null;
 let MG=null, AP=null, muted=false;
 function ac() {
-  if (!AC) {
+  if (!AC || AC.state === 'closed') {
     AC = new (window.AudioContext || window.webkitAudioContext)();
     MG = AC.createGain(); MG.connect(AC.destination);
     AP = new Proxy(AC,{get:(t,k)=>k==='destination'?MG:(typeof t[k]==='function'?t[k].bind(t):t[k])});
   }
-  if (AC.state === 'suspended') AC.resume();
+  if (AC.state !== 'running') { try{ AC.resume().catch(()=>{}) }catch(e){} }
   MG.gain.value = muted ? 0 : 1;
   return AP;
 }
@@ -605,6 +616,13 @@ function noise(start, dur, vol=0.18, fFreq=800) {
   src.connect(filt); filt.connect(g); g.connect(a.destination);
   src.start(t); src.stop(t + dur);
 }
+
+// the browser suspends/interrupts audio when the tab is left; wake it up again on return and on the first touch
+function wakeAudio(){ try{ if(AC&&AC.state!=='running'&&AC.state!=='closed') AC.resume().catch(()=>{}) }catch(e){} }
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) wakeAudio() });
+window.addEventListener('pageshow',wakeAudio);
+window.addEventListener('focus',wakeAudio);
+['pointerdown','keydown','touchstart'].forEach(ev=>document.addEventListener(ev,wakeAudio,true));
 
 // Woody knock: filtered noise burst simulating wood-on-wood impact
 function woodKnock(t, vol=0.55, pitch=1.0) {
@@ -2251,14 +2269,27 @@ window.addEventListener('load',()=>{
 function setLabel(id,name,elo){
   const e=document.getElementById(id); if(!e) return;
   e.textContent=name;
+  if(elo!=null&&titleOf(elo)){const b=document.createElement('span');b.className='ttl';b.textContent=titleOf(elo);e.appendChild(b)}
   if(elo!=null){const t=document.createElement('span');t.className='elo-tag';t.textContent=elo;e.appendChild(t)}
 }
-const RANKS=[[0,'Новачок'],[400,'Любитель'],[800,'Гравець'],[1200,'Досвідчений'],[1600,'Кандидат'],[2000,'Майстер'],[2400,'Гросмейстер'],[2800,'Легенда']];
+// [min ELO, rank name, chess title]
+const RANKS=[[0,'Новачок'],[400,'Любитель'],[800,'Гравець'],[1200,'Досвідчений'],[1600,'Кандидат','CM'],[2000,'Майстер','FM'],[2400,'Міжнародний майстер','IM'],[2600,'Гросмейстер','GM'],[2800,'Легенда','GM']];
+function titleOf(R){let t='';for(const r of RANKS) if(R>=r[0]&&r[2]) t=r[2]; return t}
+function toggleRanks(){
+  const l=document.getElementById('elo-ranks'), b=document.getElementById('elo-arrow'), open=l.hidden;
+  l.hidden=!open; b.classList.toggle('open',open); b.setAttribute('aria-expanded',open);
+}
 function updateEloCard(){
   const R=ELO.elo; let i=0; while(i+1<RANKS.length&&R>=RANKS[i+1][0]) i++;
   const lo=RANKS[i][0], nxt=i+1<RANKS.length?RANKS[i+1]:[3200,'вершини'];
   document.getElementById('elo-num').textContent=R;
-  document.getElementById('elo-rank').textContent=RANKS[i][1];
+  document.getElementById('elo-rank').textContent=RANKS[i][1]+(RANKS[i][2]?' · '+RANKS[i][2]:'');
+  const lst=document.getElementById('elo-ranks'); lst.textContent='';
+  RANKS.forEach((r,k)=>{
+    const row=document.createElement('div'); row.className='er'+(k===i?' me':'');
+    const a=document.createElement('span'); a.textContent=r[1]; if(r[2]){const b=document.createElement('span');b.className='ttl';b.textContent=r[2];a.appendChild(b)}
+    const z=document.createElement('span'); z.textContent='від '+r[0]; row.append(a,z); lst.appendChild(row);
+  });
   document.getElementById('elo-fill').style.width=Math.min(100,Math.max(0,(R-lo)/(nxt[0]-lo)*100))+'%';
   document.getElementById('elo-next').textContent=R>=3200?'Ви на вершині рейтингу':`До рівня «${nxt[1]}»: ${nxt[0]-R}`;
 }
