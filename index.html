@@ -219,6 +219,41 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
 .field.err{border-color:var(--danger)}
 #ov-rules ul{text-align:left}
 
+
+/* ---------- ELO / history / select ---------- */
+:root{--good:#2f7a4d}
+@media (prefers-color-scheme:dark){:root{--good:#6fc28b}}
+.elo-card{max-width:340px;margin:0 auto 22px;padding:18px 18px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);text-align:center}
+.elo-top{display:flex;align-items:baseline;justify-content:center;gap:8px}
+.elo-num{font-family:var(--serif);font-weight:600;font-size:2.8rem;line-height:1;font-variant-numeric:tabular-nums}
+.elo-unit{font-size:.8rem;font-weight:600;color:var(--ink-2);letter-spacing:.08em}
+.elo-rank{margin-top:4px;font-weight:600}
+.elo-bar{height:6px;border-radius:3px;background:var(--line);margin:10px auto 6px;overflow:hidden}
+.elo-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .4s}
+.elo-next{font-size:.8rem;color:var(--ink-2);margin-bottom:14px}
+.elo-card .field-l{margin-top:2px}
+.elo-link{margin-top:10px;background:none;border:0;color:var(--accent);text-decoration:underline;text-underline-offset:3px;font-size:.88rem}
+.sel{appearance:none;-webkit-appearance:none;padding:8px 34px 8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23888' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;font-size:.88rem;color:var(--ink);max-width:100%;text-align:center;text-align-last:center}
+.elo-tag{margin-left:6px;padding:0 7px;border:1px solid var(--line);border-radius:999px;font-size:.72rem;font-weight:500;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.btn-draw.cd{opacity:.45;pointer-events:none}
+.res-elo{min-height:1.2em;margin:-6px 0 16px;font-size:.88rem;color:var(--ink-2)}
+.res-elo .re-main{display:block;font-size:1.25rem;font-weight:600;color:var(--ink)}
+.res-elo .re-main b{margin-left:8px}
+.up{color:var(--good)}
+.down{color:var(--danger)}
+.hist-box{max-width:420px!important;max-height:88vh;display:flex;flex-direction:column}
+.hist-sum{font-size:.88rem;color:var(--ink-2);margin-bottom:10px}
+#hist-chart{width:100%;height:70px;margin-bottom:10px;display:block}
+.hist-list{overflow:auto;min-height:0;text-align:left;border-top:1px solid var(--line);margin-bottom:14px}
+.hist-row{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 2px;border-bottom:1px solid var(--line)}
+.hist-row .hm{font-weight:600}
+.hist-row .hm.W{color:var(--good)}
+.hist-row .hm.L{color:var(--danger)}
+.hist-row .hs,.hist-row .he{font-size:.78rem;color:var(--ink-2)}
+.hist-row .hd{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.hist-row .he{text-align:right;font-variant-numeric:tabular-nums}
+.hist-empty{padding:18px 4px;color:var(--ink-2);font-size:.9rem;text-align:center}
+
 @media(max-width:620px){
   body{padding:12px 8px 32px}
   #game{flex-direction:column;align-items:center;gap:12px}
@@ -244,8 +279,17 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
   <span class="menu-crest">♟</span>
   <h1 class="menu-title">Первісні шахи</h1>
   <p class="menu-sub">Королі та пішні</p>
+  <section class="elo-card" aria-label="Рейтинг">
+    <div class="elo-top"><span class="elo-num" id="elo-num">0</span><span class="elo-unit">ELO</span></div>
+    <div class="elo-rank" id="elo-rank">Новачок</div>
+    <div class="elo-bar"><i id="elo-fill"></i></div>
+    <div class="elo-next" id="elo-next"></div>
+    <label class="field-l" for="menu-nick">Нікнейм</label>
+    <input id="menu-nick" class="field" maxlength="16" placeholder="Введіть нікнейм" autocomplete="off">
+    <button type="button" class="elo-link" onclick="openHistory()">Історія ігор</button>
+  </section>
   <div class="opts">
-    <div class="opt-row"><span>Рівень ШІ</span><div class="chips" id="ch-diff"><button type="button" data-v="1">Легкий</button><button type="button" data-v="2">Середній</button><button type="button" data-v="3">Сильний</button></div></div>
+    <div class="opt-row"><span>Рівень ШІ</span><select id="sel-elo" class="sel" aria-label="Рівень ШІ"></select></div>
     <div class="opt-row"><span>Час на партію</span><div class="chips" id="ch-time"><button type="button" data-v="0">∞</button><button type="button" data-v="1">1 хв</button><button type="button" data-v="3">3 хв</button><button type="button" data-v="5">5 хв</button><button type="button" data-v="10">10 хв</button></div></div>
   </div>
   <div class="menu-btns">
@@ -331,6 +375,7 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
     <div class="ov-rule"></div>
     <p class="ov-msg" id="res-msg"></p>
     <p class="ov-msg" id="res-stats" style="font-size:.85rem;margin-top:-10px"></p>
+    <div id="res-elo" class="res-elo"></div>
     <div class="ov-btns">
       <button class="ov-btn ov-pri" onclick="closeResultAndReview()">Переглянути партію</button>
       <button class="ov-btn ov-sec" onclick="restartGame()">Ще раз</button>
@@ -362,7 +407,8 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
       <li>Пішень, що дійшов до кінця дошки, стає ферзем.</li>
       <li>Мат — перемога. Пату немає: хто не має безпечного ходу, той програє.</li>
       <li>Попередні ходи: поки суперник думає, можна поставити в чергу скільки завгодно своїх ходів. Фігура, що вже «походила» наперед, може так само забирати фігури суперника. Черга виконується по одному ходу, і якщо хід став неможливим, уся черга скасовується. Скасувати чергу: права кнопка миші, Esc або «Скасувати». Працює проти ШІ й онлайн.</li>
-      <li>Нічия: за згодою, за правилом 50 ходів, при триразовому повторенні позиції, а також одразу, коли на дошці лишилися самі королі — матеріалу для мату немає.</li>
+      <li>ELO: стартовий рейтинг 0. Після кожної партії з ШІ або з людиною онлайн він змінюється залежно від результату, сили суперника та точності ваших ходів, яку рушій перевіряє після гри. Чим вищий рейтинг, тим менше очок дає перемога. Підказка чи скасування ходу роблять партію нерейтинговою, а вихід із партії зараховується як поразка. Рейтинг та історія зберігаються у вашому браузері, суперник бачить ваш рейтинг.</li>
+      <li>Нічия: за згодою, за правилом 50 ходів, при триразовому повторенні позиції, а також одразу, коли на дошці лишилися самі королі — матеріалу для мату немає. Пропонувати нічию можна не частіше, ніж раз на 10 секунд.</li>
       <li>Годинник рахує від початку вашого ходу до моменту, коли фігуру переставлено, з точністю до мілісекунди. Хто першим вичерпав час, той програє.</li>
     </ul>
     <div class="ov-btns"><button class="ov-btn ov-pri" onclick="this.closest('.ov').classList.remove('on')">Зрозуміло</button></div>
@@ -394,6 +440,16 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
 </div>
 
 <!-- SURRENDER CONFIRM overlay -->
+<div id="ov-hist" class="ov">
+  <div class="ov-box hist-box">
+    <h2 class="ov-title">Історія ігор</h2>
+    <p class="hist-sum" id="hist-sum"></p>
+    <svg id="hist-chart" viewBox="0 0 300 70" preserveAspectRatio="none" aria-hidden="true"></svg>
+    <div class="hist-list" id="hist-list"></div>
+    <div class="ov-btns"><button class="ov-btn ov-pri" onclick="closeHistory()">Закрити</button></div>
+  </div>
+</div>
+
 <div id="ov-sur" class="ov">
   <div class="ov-box">
     <div class="ov-icon">🏳</div>
@@ -662,7 +718,8 @@ let fmn=1; // full move number for log
 let halfMoveClock=0;  // resets on capture or pawn move (50-move rule)
 let posHistory={};    // position key -> count (threefold repetition)
 let pre=[];           // queue of premoves [{from,to}], unlimited
-let gameId=0;
+let gameId=0, assisted=false, ratedId=-1, drawLast=0, oppDrawLast=0, oppElo=0, drawCdT=null;
+const DRAW_CD=10000;
 function later(fn,ms){const id=gameId;return setTimeout(()=>{if(id===gameId)fn()},ms)}
 let freeMove=false, remoteClock=null, turnStart=0;
 
@@ -1132,7 +1189,7 @@ function finishMove(piece, isCapture, promoted, promType, isAI){
   if(vsAI&&turn==='black'&&!gameOver){
     setUI(true);
     document.getElementById('ait').classList.add('on');
-    later(doAI,settings.diff===3?120:450+Math.random()*400);
+    later(doAI,AI.cfgFor(settings.elo).ms?120:450+Math.random()*400);
   }
 }
 
@@ -1170,14 +1227,28 @@ function doSurrender(){ if(online&&surColor&&!gameOver&&!remoteApply) netSend({t
 // ================================================================
 //  DRAW
 // ================================================================
-function offerDraw(){ if(online){ if(gameOver||drawOffered) return; drawOffered=true; drawBy=myColor; document.getElementById("btn-draw").classList.add("offered"); addLog("Ви пропонуєте нічию","ed"); netSend({t:"draw"}); return }
+function drawCdLeft(){return Math.max(0,DRAW_CD-(Date.now()-drawLast))}
+function refreshDrawBtn(){
+  clearTimeout(drawCdT);
+  const b=document.getElementById('btn-draw'); if(!b) return;
+  b.classList.toggle('offered',drawOffered&&!gameOver);
+  const left=gameOver?0:drawCdLeft();
+  if(left>0&&!drawOffered){
+    b.classList.add('cd'); b.textContent=`Нічию можна через ${Math.ceil(left/1000)} с`;
+    drawCdT=setTimeout(refreshDrawBtn,250);
+  } else { b.classList.remove('cd'); b.textContent='Запропонувати нічию'; }
+}
+function offerDraw(){
   if(gameOver||drawOffered) return;
-  drawOffered=true; drawBy=turn;
-  document.getElementById('btn-draw').classList.add('offered');
+  const left=drawCdLeft();
+  if(left>0){ toast(`Нічию можна запропонувати знову через ${Math.ceil(left/1000)} с`); return }
+  drawLast=Date.now();
+  if(online){ drawOffered=true; drawBy=myColor; refreshDrawBtn(); addLog("Ви пропонуєте нічию","ed"); netSend({t:"draw"}); return }
+  drawOffered=true; drawBy=turn; refreshDrawBtn();
   addLog(`${turn==='white'?'Білі':'Чорні'} пропонують нічию`,'ed');
   if(vsAI&&turn==='white'){
     later(()=>{
-      if(aiAcceptDraw()){addLog('ШІ приймає нічию','ai');gameOver=true;renderBoard(board,null,[],lastMove,null);updateUI();playDraw();showResult('Нічия','ШІ погодився.','🤝')}
+      if(aiAcceptDraw()){addLog('ШІ приймає нічию','ai');gameOver=true;renderBoard(board,null,[],lastMove,null);updateUI();playDraw();showResult('Нічия','ШІ погодився.','')}
       else{addLog('ШІ відхиляє нічию','ai');resetDraw()}
     },900);
   } else if(!vsAI){
@@ -1192,9 +1263,7 @@ function respondDraw(yes){ if(online&&!remoteApply) netSend({t:"drawr",y:!!yes})
   else{addLog(`${opp} відхиляють нічию`,'ed');resetDraw()}
 }
 function resetDraw(){
-  drawOffered=false;drawBy=null;
-  const b=document.getElementById('btn-draw');
-  b.textContent='Запропонувати нічию';b.classList.remove('offered');
+  drawOffered=false;drawBy=null; refreshDrawBtn();
 }
 
 // ================================================================
@@ -1541,11 +1610,27 @@ const AI=(()=>{
     return best;
   }
 
-  const LV={
-    1:{depth:1,noise:220,rnd:0.15,fixed:true},
-    2:{depth:4,noise:20,rnd:0,fixed:true},
-    3:{depth:40,noise:0,rnd:0,ms:1200}
-  };
+  // 16 strength levels, 200..3200 "ELO" (nominal scale for this kings-and-pawns variant)
+  const LEVELS=[
+    {elo:200,  name:'Грає майже навмання',        rnd:.70, noise:600, depth:1},
+    {elo:400,  name:'Часто помиляється',          rnd:.45, noise:420, depth:1},
+    {elo:600,  name:'Бачить лише прості взяття',  rnd:.30, noise:300, depth:1},
+    {elo:800,  name:'Новачок',                    rnd:.16, noise:200, depth:1},
+    {elo:1000, name:'Знає основи',                rnd:.10, noise:150, depth:2},
+    {elo:1200, name:'Любитель',                   rnd:.05, noise:110, depth:2},
+    {elo:1400, name:'Бачить прості тактики',      rnd:.03, noise:100, depth:3},
+    {elo:1600, name:'Клубний гравець',            rnd:0,   noise:45,  depth:3},
+    {elo:1800, name:'Сильний аматор',             rnd:0,   noise:55,  depth:4},
+    {elo:2000, name:'Кандидат у майстри',         depth:6,  ms:300,  slip:.12, range:300},
+    {elo:2200, name:'Майстер',                    depth:7,  ms:450,  slip:.09, range:260},
+    {elo:2400, name:'Міжнародний майстер',        depth:9,  ms:650,  slip:.06, range:200},
+    {elo:2600, name:'Гросмейстер',                depth:11, ms:850,  slip:.04, range:160},
+    {elo:2800, name:'Супергросмейстер',           depth:13, ms:1100, slip:.02, range:120},
+    {elo:3000, name:'Шаховий рушій',              depth:17, ms:1500, slip:.008, range:80},
+    {elo:3200, name:'Максимальна сила',           depth:40, ms:2000}
+  ];
+  let timeScale=1;
+  function cfgFor(elo){ return LEVELS[Math.max(0,Math.min(LEVELS.length-1,Math.round(elo/200)-1))] }
 
   function encode(c,b){
     const f=c.from.row*8+c.from.col, t=c.to.row*8+c.to.col;
@@ -1558,7 +1643,7 @@ const AI=(()=>{
 
   // cands: [{from,to,m}] (legal). returns index of chosen candidate.
   function choose(b,color,epObj,cands,level,msOverride){
-    const cfg=LV[level]||LV[2], n=cands.length;
+    const cfg=typeof level==='object'?level:cfgFor(level), n=cands.length;
     lastScore=0; lastDepth=0;
     if(n<=1) return 0;
     if(cfg.rnd&&Math.random()<cfg.rnd) return Math.floor(Math.random()*n);
@@ -1566,7 +1651,7 @@ const AI=(()=>{
     const enc=cands.map(c=>encode(c,b));
     nodes=0; stop=false; KIL.fill(0);
     const start=performance.now();
-    if(cfg.fixed){
+    if(cfg.noise!==undefined){
       deadline=start+8000;
       let bi=0,bs=-INF;
       for(let i=0;i<n;i++){
@@ -1580,7 +1665,7 @@ const AI=(()=>{
       lastScore=bs; lastDepth=cfg.depth;
       return bi;
     }
-    const ms=msOverride||cfg.ms;
+    const ms=(msOverride||cfg.ms)*timeScale;
     deadline=start+ms;
     let order=[...Array(n).keys()], bestIdx=0, bestScore=-INF;
     for(let depth=1;depth<=cfg.depth;depth++){
@@ -1600,12 +1685,39 @@ const AI=(()=>{
       if(performance.now()-start>ms*0.45) break;
     }
     lastScore=bestScore;
+    // rare "plausible slip": a worse-but-reasonable move, less and less likely at higher levels
+    if(cfg.slip&&Math.random()<cfg.slip){
+      stop=false; deadline=performance.now()+400;
+      const sc=[]; let best3=-INF;
+      for(let i=0;i<n;i++){
+        make(enc[i],0); const v=-search(2,-INF,INF,1); unmake(enc[i],0);
+        if(stop) return bestIdx;
+        sc.push(v); if(v>best3) best3=v;
+      }
+      const pool=[]; for(let i=0;i<n;i++) if(i!==bestIdx&&sc[i]>=best3-cfg.range) pool.push(i);
+      if(pool.length) return pool[Math.floor(Math.random()*pool.length)];
+    }
     return bestIdx;
   }
 
+  // exact scores (centipawns, side to move's view) of every candidate at a fixed depth; null if time ran out
+  function analyze(b,color,epObj,cands,depth,ms){
+    load(b,color,epObj);
+    const enc=cands.map(c=>encode(c,b));
+    nodes=0; stop=false; KIL.fill(0); deadline=performance.now()+ms;
+    const out=[];
+    for(let i=0;i<enc.length;i++){
+      make(enc[i],0);
+      const v=-search(depth-1,-INF,INF,1);
+      unmake(enc[i],0);
+      if(stop) return null;
+      out.push(v);
+    }
+    return out;
+  }
   function reset(){ tk1.fill(0); tk2.fill(0); td.fill(0); }
   function evalBlack(b){ load(b,'black',null); return evaluate(); }
-  return {choose,reset,evalBlack,get lastScore(){return lastScore},get lastDepth(){return lastDepth},get nodes(){return nodes},
+  return {choose,analyze,cfgFor,LEVELS,get timeScale(){return timeScale},set timeScale(v){timeScale=v},MATE,reset,evalBlack,get lastScore(){return lastScore},get lastDepth(){return lastDepth},get nodes(){return nodes},
           _load:load,_gen:(ply,caps)=>gen(ply,caps),_MV:MV,_B:B};
 })();
 
@@ -1625,7 +1737,7 @@ function aiPickMove(color,level,ms){
   const pool=cands.slice();
   for(let tries=0;tries<3&&pool.length;tries++){
     const i=AI.choose(board,color,epTarget,pool,level,ms), cd=pool[i];
-    if(level<3||pool.length<2) return cd;
+    if(level<2000||pool.length<2) return cd;
     // when ahead, don't walk into a threefold repetition
     const nb=applyMove(board,cd.from,cd.to,cd.m,epTarget);
     const nep=cd.m.kind==='double'?{row:cd.from.row+(color==='white'?-1:1),col:cd.from.col}:null;
@@ -1639,9 +1751,9 @@ function doAI(){
   document.getElementById('ait').classList.remove('on');
   setUI(false);
   if(gameOver||!vsAI||turn!=='black') return;
-  let ms;
-  if(settings.diff===3){ ms=1200; if(timeCtl) ms=Math.max(150,Math.min(ms,clockLeft('black')/25)) }
-  const cd=aiPickMove('black',settings.diff,ms);
+  let ms; const cfg=AI.cfgFor(settings.elo);
+  if(cfg.ms){ ms=cfg.ms; if(timeCtl) ms=Math.max(120,Math.min(ms,clockLeft('black')/25)) }
+  const cd=aiPickMove('black',settings.elo,ms);
   if(cd) execMove(cd.from,cd.to,cd.m,true);
 }
 
@@ -1651,7 +1763,7 @@ function doAI(){
 function startGame(ai){
   gameId++; vsAI=ai; board=initBoard(); turn='white';
   sel=null; possible=[]; lastMove=null; epTarget=null;
-  gameOver=false; drawOffered=false; drawBy=null;
+  gameOver=false; drawOffered=false; drawBy=null; assisted=false; drawLast=0; oppDrawLast=0;
   fmn=1; history=[]; replayIdx=-1;
   halfMoveClock=0; posHistory={}; pre.length=0; AI.reset();
   document.getElementById('log').innerHTML='';
@@ -1667,11 +1779,11 @@ function startGame(ai){
   const ws=document.getElementById('btn-ws');
   if(vsAI){
     bs.style.display='none'; ws.textContent='Здатися';
-    document.getElementById('lbl-black').textContent='ШІ (чорні)';
+    setLabel('lbl-black','ШІ',settings.elo); setLabel('lbl-white','Ви',ELO.elo);
     addLog('Гра проти ШІ. Ви граєте білими.','eg');
   } else {
     bs.style.display=''; ws.textContent='Білі здаються';
-    document.getElementById('lbl-black').textContent='Чорні';
+    setLabel('lbl-black','Чорні'); setLabel('lbl-white','Білі');
     addLog('Гра двох гравців.','eg');
   }
   // Record starting position
@@ -1683,7 +1795,9 @@ function startGame(ai){
   document.getElementById('game').style.display='flex';
 }
 function restartGame(){ if(online){ onlineRematch(); return }document.getElementById('ov-result').classList.remove('on');startGame(vsAI)}
-function goMenu(){gameId++; clearInterval(tickT); pre.length=0; leaveOnline();
+function goMenu(){
+  if(!gameOver&&abandonCheck()===false) return;
+  gameId++; clearInterval(tickT); pre.length=0; leaveOnline();
   document.getElementById('game').style.display='none';
   ['ov-result','ov-draw','ov-sur'].forEach(id=>document.getElementById(id).classList.remove('on'));
   document.getElementById('menu').style.display='block';
@@ -1732,6 +1846,11 @@ window.addEventListener('load',resize);
 // ================================================================
 let animPending=false, capList={white:[],black:[]}, clocks={white:0,black:0}, timeCtl=0, tickT=null, lastTick=0, toastT=null;
 const settings=Object.assign({diff:2,time:0,theme:'classic',sound:true},(()=>{try{return JSON.parse(localStorage.getItem('pc_set')||'{}')}catch(e){return{}}})());
+if(!(+settings.elo>=200)) settings.elo={1:400,2:1200,3:2600}[settings.diff]||800;
+settings.elo=Math.max(200,Math.min(3200,Math.round(settings.elo/200)*200));
+const ELO=(()=>{let d={};try{d=JSON.parse(localStorage.getItem('pc_elo')||'{}')}catch(e){}
+  return {elo:Math.max(0,Math.min(3500,+d.elo||0)),hist:Array.isArray(d.hist)?d.hist.slice(-200):[]}})();
+function saveElo(){try{localStorage.setItem('pc_elo',JSON.stringify(ELO))}catch(e){}}
 const THEMES=[['classic','Шавлія'],['wood','Дерево'],['ice','Крига'],['night','Ніч']];
 function save(){try{localStorage.setItem('pc_set',JSON.stringify(settings))}catch(e){}}
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),1600)}
@@ -1801,7 +1920,8 @@ function timeOut(k){ if(online){ if(k!==myColor&&!remoteApply) return; if(k===my
 // hint
 function showHint(){ if(online) return;
   if(gameOver||replayIdx>=0||(vsAI&&turn==='black')) return;
-  const cd=aiPickMove(turn,3,600); if(!cd) return;
+  const cd=aiPickMove(turn,3200,600); if(!cd) return;
+  assisted=true;
   sel=null; possible=[];
   renderBoard(board,null,[],lastMove,chkTarget());
   document.getElementById(`c${cd.from.row}${cd.from.col}`).classList.add('hint');
@@ -1816,7 +1936,7 @@ window.addEventListener('load',()=>{
     bn.insertBefore(caps,d); bn.insertBefore(ck,d);
   });
   document.querySelectorAll('.chips').forEach(g=>{
-    const key=g.id==='ch-diff'?'diff':'time';
+    const key='time';
     [...g.children].forEach(b=>{
       b.classList.toggle('on',String(settings[key])===b.dataset.v);
       b.onclick=()=>{settings[key]=+b.dataset.v;[...g.children].forEach(x=>x.classList.toggle('on',x===b));save()};
@@ -1838,7 +1958,7 @@ function undoMove(){ if(online) return;
   if(gameOver||replayIdx>=0||!undoStack.length||document.getElementById('ait').classList.contains('on')) return toast('Немає що скасовувати');
   let s=undoStack.pop();
   if(vsAI){while(s.t!=='white'&&undoStack.length) s=undoStack.pop(); if(s.t!=='white') return;}
-  pre.length=0; if(timeCtl) turnStart=performance.now();
+  assisted=true; pre.length=0; if(timeCtl) turnStart=performance.now();
   board=s.b;turn=s.t;epTarget=s.ep;lastMove=s.lm;halfMoveClock=s.hm;posHistory=s.ph;fmn=s.fm;capList=s.cl;history.length=s.hl;
   const lg=document.getElementById('log'); while(lg.children.length>s.ll) lg.removeChild(lg.firstChild);
   sel=null;possible=[];
@@ -1870,7 +1990,9 @@ function onResult(title,msg){
   }
   const dur=Math.round((Date.now()-gameStart)/1000);
   document.getElementById('res-stats').textContent=`Ходів: ${Math.max(1,fmn-1)}, час ${fmt(dur)}`;
-  if(/перемагають/.test(msg)&&(!vsAI||/Білі перемагають/.test(msg))) confetti();
+  const w=/Білі перемагають/.test(msg)?'white':/Чорні перемагають/.test(msg)?'black':null;
+  if(w&&(vsAI?w==='white':online?w===myColor:true)) confetti();
+  startRating(title,msg);
 }
 function replayAuto(){
   const b=document.getElementById('rep-play');
@@ -1961,8 +2083,8 @@ function saveNick(){
 function updateNickLabels(){
   if(!online) return;
   const me=nm(myNickRaw())+' (ви)', op=nm(oppNick);
-  document.getElementById('lbl-white').textContent=myColor==='white'?me:op;
-  document.getElementById('lbl-black').textContent=myColor==='black'?me:op;
+  setLabel('lbl-white',myColor==='white'?me:op,myColor==='white'?ELO.elo:oppElo);
+  setLabel('lbl-black',myColor==='black'?me:op,myColor==='black'?ELO.elo:oppElo);
 }
 const PFX='pervisni-chess-', gid=id=>document.getElementById(id), oppOf=k=>k==='white'?'black':'white';
 function netSend(d){try{if(conn&&conn.open)conn.send(d)}catch(e){}}
@@ -1979,20 +2101,20 @@ function shareRoom(){
   else{try{navigator.clipboard.writeText(url);toast('Посилання скопійовано')}catch(e){prompt('Скопіюйте посилання:',url)}}
 }
 function hostRoom(){
-  if(!saveNick())return; if(!needPeer())return; oppNick=''; killPeer(); const code=genCode(); onTime=settings.time;
+  if(!saveNick())return; if(!needPeer())return; oppNick=''; oppElo=0; killPeer(); const code=genCode(); onTime=settings.time;
   peer=new Peer(PFX+code);
   peer.on('open',()=>showWait(code,'Очікуємо суперника… Надішліть йому код або посилання.',true));
   peer.on('connection',cn=>{
     if(conn){cn.close();return}
     conn=cn; hookConn();
-    cn.on('open',()=>{netSend({t:'start',time:onTime,nick:myNickRaw()});myColor='white';online=true;gid('ov-online').classList.remove('on');beginOnline(false)});
+    cn.on('open',()=>{netSend({t:'start',time:onTime,nick:myNickRaw(),elo:ELO.elo});myColor='white';online=true;gid('ov-online').classList.remove('on');beginOnline(false)});
   });
   peer.on('error',e=>{if(e.type==='unavailable-id')hostRoom();else showWait('','Помилка мережі: '+e.type,false)});
 }
 function joinRoom(){
   if(!needPeer())return;
   const code=gid('on-code').value.trim().toUpperCase(); if(code.length<3) return toast('Введіть код із 3 цифр');
-  if(!saveNick()) return; oppNick='';
+  if(!saveNick()) return; oppNick=''; oppElo=0;
   killPeer(); showWait(code,'Підключення…',false);
   peer=new Peer();
   peer.on('open',()=>{
@@ -2006,8 +2128,9 @@ function hookConn(){conn.on('data',onNetData);conn.on('close',onNetClose);conn.o
 function onNetData(d){
   if(!d||typeof d!=='object') return;
   const opp=oppOf(myColor);
-  if(d.t==='start'&&!online){clearTimeout(joinTimer);online=true;myColor='black';onTime=+d.time||0;oppNick=cleanNick(d.nick);gid('ov-online').classList.remove('on');beginOnline(false);netSend({t:'nick',n:myNickRaw()})}
-  else if(d.t==='nick'&&online){oppNick=cleanNick(d.n);updateNickLabels()}
+  if(d.t==='start'&&!online){clearTimeout(joinTimer);online=true;myColor='black';onTime=+d.time||0;oppNick=cleanNick(d.nick);oppElo=Math.max(0,Math.min(3500,+d.elo||0));gid('ov-online').classList.remove('on');beginOnline(false);netSend({t:'nick',n:myNickRaw(),elo:ELO.elo})}
+  else if(d.t==='nick'&&online){oppNick=cleanNick(d.n);oppElo=Math.max(0,Math.min(3500,+d.elo||0));updateNickLabels()}
+  else if(d.t==='elo'&&online){oppElo=Math.max(0,Math.min(3500,+d.e||0));updateNickLabels()}
   else if(d.t==='mv'&&online&&!gameOver&&turn===opp&&d.f&&d.to&&[d.f.row,d.f.col,d.to.row,d.to.col].every(n=>Number.isInteger(n)&&n>=0&&n<8)){
     const m=legalMoves(board,d.f.row,d.f.col,epTarget).find(x=>x.row===d.to.row&&x.col===d.to.col);
     if(m&&board[d.f.row][d.f.col]?.color===opp){remoteClock=(typeof d.ct==='number')?d.ct:null;remoteApply=true;execMove({row:d.f.row,col:d.f.col},{row:d.to.row,col:d.to.col},m,false);remoteApply=false}
@@ -2015,7 +2138,8 @@ function onNetData(d){
   else if(d.t==='sur'&&online&&!gameOver){surColor=opp;remoteApply=true;doSurrender();remoteApply=false}
   else if(d.t==='draw'&&online&&!gameOver){
     if(drawOffered&&drawBy===myColor){drawBy=opp;respondDraw(true)}   // both offered = agreed
-    else{drawOffered=true;drawBy=opp;gid('draw-msg').textContent=nm(oppNick)+' пропонує нічию. Прийняти?';gid('ov-draw').classList.add('on');addLog(nm(oppNick)+' пропонує нічию','ed')}
+    else if(Date.now()-oppDrawLast<DRAW_CD){netSend({t:'drawr',y:false})}   // spam guard
+    else{oppDrawLast=Date.now();drawOffered=true;drawBy=opp;gid('draw-msg').textContent=nm(oppNick)+' пропонує нічию. Прийняти?';gid('ov-draw').classList.add('on');addLog(nm(oppNick)+' пропонує нічию','ed')}
   }
   else if(d.t==='drawr'&&online&&drawOffered&&drawBy===myColor){remoteApply=true;respondDraw(!!d.y);remoteApply=false}
   else if(d.t==='to'&&online&&!gameOver){remoteApply=true;timeOut(opp);remoteApply=false}
@@ -2054,7 +2178,7 @@ function leaveOnline(){
   if(!was) return;
   document.body.classList.remove('online','flip');
   gid('btn-ws').style.display=''; gid('btn-bs').style.display='';
-  gid('lbl-white').textContent='Білі'; gid('lbl-black').textContent='Чорні'; oppNick='';
+  setLabel('lbl-white','Білі'); setLabel('lbl-black','Чорні'); oppNick=''; oppElo=0;
   const ch=gid('chat'); if(ch){ch.style.display='none';gid('chat-log').innerHTML=''}
 }
 // chat
@@ -2087,6 +2211,179 @@ window.addEventListener('load',()=>{
 window.addEventListener('load',()=>{
   const m=/room=(\d{3})/.exec(location.hash);
   if(m){openOnline();gid('on-code').value=m[1];toast('Введіть нікнейм і натисніть «Увійти»')}
+});
+
+// ================================================================
+//  v6: ELO rating, game analysis, history, persistent nickname
+// ================================================================
+function setLabel(id,name,elo){
+  const e=document.getElementById(id); if(!e) return;
+  e.textContent=name;
+  if(elo!=null){const t=document.createElement('span');t.className='elo-tag';t.textContent=elo;e.appendChild(t)}
+}
+const RANKS=[[0,'Новачок'],[400,'Любитель'],[800,'Гравець'],[1200,'Досвідчений'],[1600,'Кандидат'],[2000,'Майстер'],[2400,'Гросмейстер'],[2800,'Легенда']];
+function updateEloCard(){
+  const R=ELO.elo; let i=0; while(i+1<RANKS.length&&R>=RANKS[i+1][0]) i++;
+  const lo=RANKS[i][0], nxt=i+1<RANKS.length?RANKS[i+1]:[3200,'вершини'];
+  document.getElementById('elo-num').textContent=R;
+  document.getElementById('elo-rank').textContent=RANKS[i][1];
+  document.getElementById('elo-fill').style.width=Math.min(100,Math.max(0,(R-lo)/(nxt[0]-lo)*100))+'%';
+  document.getElementById('elo-next').textContent=R>=3200?'Ви на вершині рейтингу':`До рівня «${nxt[1]}»: ${nxt[0]-R}`;
+}
+function eloDelta(R,O,S,acc){
+  const E=1/(1+Math.pow(10,(O-R)/400));
+  const K=14+106*Math.pow(Math.max(0,1-R/3000),2);   // 120 at 0 ... ~14 near 3000
+  let d=K*(S-E);
+  const a=acc==null?0.6:acc;
+  if(d>0) d*=0.7+0.6*a; else d*=1.3-0.6*a;           // accurate play: bigger gains, smaller losses
+  if(R>3000&&d>0) d*=Math.max(0.25,1-(R-3000)/600);
+  d=Math.round(d);
+  if(S===1&&d<1) d=1;
+  if(S===0&&d>-1) d=-1;
+  return d;
+}
+function rateCtx(){
+  if(online) return {kind:'online',color:myColor,oppName:nm(oppNick),oppElo:oppElo};
+  if(vsAI) return {kind:'ai',color:'white',oppName:'ШІ',oppElo:settings.elo};
+  return null;
+}
+function applyRating(ctx,outcome,acc,extra){
+  const R=ELO.elo, S=outcome==='win'?1:outcome==='draw'?.5:0;
+  const after=Math.max(0,Math.min(3500,R+eloDelta(R,ctx.oppElo,S,acc)));
+  ELO.elo=after;
+  ELO.hist.push(Object.assign({t:Date.now(),kind:ctx.kind,opp:ctx.oppName,oppElo:ctx.oppElo,res:outcome==='win'?'W':outcome==='draw'?'D':'L',d:after-R,after,acc:acc==null?null:Math.round(acc*100)},extra||{}));
+  if(ELO.hist.length>200) ELO.hist.splice(0,ELO.hist.length-200);
+  saveElo(); updateEloCard();
+  if(online){updateNickLabels(); if(conn&&conn.open) netSend({t:'elo',e:after})}
+  else if(vsAI) setLabel('lbl-white','Ви',after);
+  return {before:R,after,delta:after-R};
+}
+function ownMoves(color){return history.filter(f=>f.from&&f.turn===color).length}
+function abandonCheck(){
+  const ctx=rateCtx(); if(!ctx||assisted||ratedId===gameId) return true;
+  if(ownMoves(ctx.color)<3) return true;
+  if(!confirm('Вийти з партії? Її буде зараховано як поразку.')) return false;
+  ratedId=gameId;
+  const r=applyRating(ctx,'loss',null,{note:'вихід'});
+  toast(`ELO ${r.delta>0?'+':''}${r.delta}`);
+  return true;
+}
+
+// ---- move analysis: how far each of my moves was from the engine's best
+function moveAcc(loss){return 1/(1+Math.pow(loss/100,1.5))}
+function analyzeMoves(frames,color,onProgress,onDone){
+  let items=frames.filter(f=>f.from&&f.turn===color);
+  if(items.length>60){const step=items.length/60;items=Array.from({length:60},(_,i)=>items[Math.floor(i*step)])}
+  const clip=v=>Math.max(-1500,Math.min(1500,v));
+  const res={n:0,sum:0,blunders:0,mistakes:0};
+  let i=0;
+  const step=()=>{
+    if(i>=items.length){onDone(res);return}
+    const f=items[i++];
+    try{
+      const ep=f.ep&&f.ep.row!==undefined?f.ep:null, cands=[];
+      for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+        if(f.board[r][c]?.color!==color) continue;
+        for(const m of legalMoves(f.board,r,c,ep)) cands.push({from:{row:r,col:c},to:{row:m.row,col:m.col},m});
+      }
+      if(cands.length>1){
+        const sc=AI.analyze(f.board,color,ep,cands,4,220);
+        const k=cands.findIndex(c=>c.from.row===f.from.row&&c.from.col===f.from.col&&c.to.row===f.to.row&&c.to.col===f.to.col);
+        if(sc&&k>=0){
+          const loss=Math.max(0,clip(Math.max(...sc))-clip(sc[k]));
+          res.n++; res.sum+=moveAcc(loss);
+          if(loss>=300) res.blunders++; else if(loss>=120) res.mistakes++;
+        }
+      }
+    }catch(e){}
+    onProgress(i/items.length);
+    setTimeout(step,0);
+  };
+  setTimeout(step,0);
+}
+function startRating(title,msg){
+  const box=document.getElementById('res-elo'); if(!box) return;
+  box.textContent=''; box.className='res-elo';
+  const ctx=rateCtx(); if(!ctx) return;
+  const note=t=>{box.textContent=t};
+  if(ratedId===gameId) return;
+  if(title==='Зв’язок втрачено') return note('Партія нерейтингова: зв’язок втрачено.');
+  if(assisted) return note('Партія нерейтингова: використано підказку або скасування ходу.');
+  const frames=history.slice();
+  if(frames.filter(f=>f.from&&f.turn===ctx.color).length<2) return note('Партія надто коротка для рейтингу.');
+  ratedId=gameId;
+  const winner=/Білі перемагають/.test(msg)?'white':/Чорні перемагають/.test(msg)?'black':null;
+  const outcome=winner===null?'draw':winner===ctx.color?'win':'loss';
+  const gid_=gameId;
+  note('Аналізуємо ваші ходи…');
+  analyzeMoves(frames,ctx.color,p=>{if(gid_===gameId&&ratedId===gid_&&!box.dataset.done) note(`Аналізуємо ваші ходи… ${Math.round(p*100)}%`)},res=>{
+    const acc=res.n?res.sum/res.n:null;
+    const r=applyRating(ctx,outcome,acc,{moves:ownMoves(ctx.color),bl:res.blunders});
+    if(gid_!==gameId) return;
+    box.textContent='';
+    const main=document.createElement('span'); main.className='re-main';
+    main.appendChild(document.createTextNode(`ELO ${r.after}`));
+    const dl=document.createElement('b'); dl.className=r.delta>0?'up':r.delta<0?'down':''; dl.textContent=(r.delta>0?'+':'')+r.delta;
+    main.appendChild(dl); box.appendChild(main);
+    const sub=document.createElement('span');
+    sub.textContent=acc==null?'Усі ходи були вимушеними.':`Точність ${Math.round(acc*100)}%, неточностей ${res.mistakes}, грубих помилок ${res.blunders}`;
+    box.appendChild(sub);
+  });
+}
+
+// ---- history overlay
+function openHistory(){
+  const h=ELO.hist.slice().reverse();
+  const cnt=k=>h.filter(x=>x.res===k).length;
+  document.getElementById('hist-sum').textContent=h.length?`Ігор: ${h.length}. Перемог ${cnt('W')}, нічиїх ${cnt('D')}, поразок ${cnt('L')}.`:'';
+  // chart
+  const svg=document.getElementById('hist-chart'); svg.textContent='';
+  const pts=[0,...ELO.hist.slice(-60).map(x=>x.after)];
+  if(pts.length>1){
+    const NS='http://www.w3.org/2000/svg', mx=Math.max(...pts,100), mn=Math.min(...pts);
+    const X=i=>4+i*(292/(pts.length-1)), Y=v=>66-(v-mn)/(mx-mn||1)*60;
+    const pl=document.createElementNS(NS,'polyline');
+    pl.setAttribute('points',pts.map((v,i)=>X(i).toFixed(1)+','+Y(v).toFixed(1)).join(' '));
+    pl.setAttribute('fill','none'); pl.setAttribute('stroke','var(--accent)'); pl.setAttribute('stroke-width','2'); pl.setAttribute('vector-effect','non-scaling-stroke');
+    svg.appendChild(pl);
+    svg.style.display='';
+  } else svg.style.display='none';
+  const list=document.getElementById('hist-list'); list.textContent='';
+  if(!h.length){const e=document.createElement('div');e.className='hist-empty';e.textContent='Ігор ще немає. Зіграйте з ШІ або онлайн, і тут з’явиться історія.';list.appendChild(e)}
+  const RN={W:'Перемога',D:'Нічия',L:'Поразка'};
+  h.forEach(x=>{
+    const row=document.createElement('div'); row.className='hist-row';
+    const hm=document.createElement('span'); hm.className='hm '+x.res;
+    hm.textContent=`${RN[x.res]||''}, ${x.opp||'—'} (${x.oppElo})`;
+    const hd=document.createElement('span'); hd.className='hd '+(x.d>0?'up':x.d<0?'down':'');
+    hd.textContent=(x.d>0?'+':'')+x.d;
+    const hs=document.createElement('span'); hs.className='hs';
+    const dt=new Date(x.t).toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    hs.textContent=[dt,x.kind==='online'?'онлайн':'проти ШІ',x.acc!=null?`точність ${x.acc}%`:(x.note||'')].filter(Boolean).join(', ');
+    const he=document.createElement('span'); he.className='he'; he.textContent='ELO '+x.after;
+    row.append(hm,hd,hs,he); list.appendChild(row);
+  });
+  document.getElementById('ov-hist').classList.add('on');
+}
+function closeHistory(){document.getElementById('ov-hist').classList.remove('on')}
+
+// ---- nickname: saved while typing, restored on every visit
+function syncNickInputs(from){
+  const v=from.value;
+  settings.nick=cleanNick(v); save();
+  ['menu-nick','on-nick'].forEach(id=>{const e=document.getElementById(id); if(e&&e!==from) e.value=v});
+}
+window.addEventListener('load',()=>{
+  ['menu-nick','on-nick'].forEach(id=>{
+    const e=document.getElementById(id); if(!e) return;
+    e.value=settings.nick||'';
+    e.addEventListener('input',()=>syncNickInputs(e));
+  });
+  const sel=document.getElementById('sel-elo');
+  AI.LEVELS.forEach(l=>{const o=document.createElement('option');o.value=l.elo;o.textContent=`${l.elo} ELO, ${l.name}`;sel.appendChild(o)});
+  sel.value=settings.elo;
+  sel.addEventListener('change',()=>{settings.elo=+sel.value;save()});
+  updateEloCard();
 });
 </script>
 </body>
