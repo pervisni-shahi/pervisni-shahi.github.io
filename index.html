@@ -381,7 +381,7 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
 </div>
 
 </div>
-<footer class="site-foot">v4.1.6 Full. © 7-Б Учні 2026</footer>
+<footer class="site-foot">v4.1 Full. © 7-Б Учні 2026</footer>
 
 <!-- RESULT overlay -->
 <div id="ov-result" class="ov">
@@ -938,7 +938,7 @@ function buildBoard(){
   const cr=document.getElementById('cr'),cf=document.getElementById('cf');
   cr.innerHTML=''; cf.innerHTML='';
   for(let r=0;r<8;r++){const s=document.createElement('span');s.textContent=8-r;cr.appendChild(s)}
-  for(let c=0;c<8;c++){const s=document.createElement('span');s.textContent=FILES[c];cf.appendChild(s)}
+  for(let c=0;c<8;c++){const s=document.createElement('span');s.textContent=FILES[c];if(c===5)s.addEventListener('click',secretHint);cf.appendChild(s)}
   const el=document.getElementById('board'); el.innerHTML='';
   for(let r=0;r<8;r++) for(let c=0;c<8;c++){
     const cell=document.createElement('div');
@@ -1990,6 +1990,15 @@ function showHint(){ if(online||vsAI) return;
   document.getElementById(`c${cd.from.row}${cd.from.col}`).classList.add('hint');
   document.getElementById(`c${cd.to.row}${cd.to.col}`).classList.add('hint');
 }
+// secret: a click on the letter «f» under the board shows the engine's best move (works also against the AI; the game stays rated)
+function secretHint(){
+  if(online||gameOver||replayIdx>=0||(vsAI&&turn==='black')) return;
+  const cd=aiPickMove(turn,{depth:40,ms:600},600); if(!cd) return;
+  sel=null; possible=[];
+  renderBoard(board,null,[],lastMove,chkTarget());
+  document.getElementById(`c${cd.from.row}${cd.from.col}`).classList.add('hint');
+  document.getElementById(`c${cd.to.row}${cd.to.col}`).classList.add('hint');
+}
 // init
 window.addEventListener('load',()=>{
   ['white','black'].forEach(k=>{
@@ -2318,6 +2327,7 @@ function eloDelta(R,O,S,acc,kind,tc,scale){
   if(S===0&&d>-1) d=-1;
   let bonus=0;                                           // fast games: extra share of what was won
   if(d>0){const p=tcInfo(tc).p; if(p>0){bonus=Math.max(1,Math.round(d*p)); d+=bonus}}
+  if(kind==='ai'&&R<1000&&d>150){bonus=Math.max(0,bonus-(d-150)); d=150}   // early game (below 1000 ELO): at most +150 per win, so ratings don't grow too fast
   return {d,bonus};
 }
 function rateCtx(){
