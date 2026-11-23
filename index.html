@@ -381,7 +381,7 @@ body.online .tool[onclick^="undoMove"],body.online .tool[onclick^="showHint"],bo
 </div>
 
 </div>
-<footer class="site-foot">v4.1.4 Full. © 7-Б Учні 2026</footer>
+<footer class="site-foot">v4.1 Full. © 7-Б Учні 2026</footer>
 
 <!-- RESULT overlay -->
 <div id="ov-result" class="ov">
@@ -1654,22 +1654,22 @@ const AI=(()=>{
 
   // 16 strength levels, 200..3200 "ELO" (nominal scale for this kings-and-pawns variant)
   const LEVELS=[
-    {elo:200,  name:'Грає майже навмання',        rnd:.70, noise:600, depth:1},
-    {elo:400,  name:'Часто помиляється',          rnd:.45, noise:420, depth:1},
-    {elo:600,  name:'Бачить лише прості взяття',  rnd:.30, noise:300, depth:1},
-    {elo:800,  name:'Новачок',                    rnd:.16, noise:200, depth:1},
-    {elo:1000, name:'Знає основи',                rnd:.07, noise:120, depth:3},
-    {elo:1200, name:'Любитель',                   rnd:.04, noise:95,  depth:3},
-    {elo:1400, name:'Бачить прості тактики',      rnd:.02, noise:75,  depth:4},
-    {elo:1600, name:'Клубний гравець',            rnd:0,   noise:45,  depth:4},
-    {elo:1800, name:'Сильний аматор',             rnd:0,   noise:35,  depth:5},
-    {elo:2000, name:'Кандидат у майстри',         depth:6,  ms:300,  slip:.12,  range:300},
-    {elo:2200, name:'Майстер',                    depth:7,  ms:450,  slip:.09,  range:260},
-    {elo:2400, name:'Міжнародний майстер',        depth:8,  ms:550,  slip:.075, range:230},
-    {elo:2600, name:'Гросмейстер',                depth:9,  ms:650,  slip:.06,  range:200},
-    {elo:2800, name:'Супергросмейстер',           depth:10, ms:700,  slip:.055, range:190},
-    {elo:3000, name:'Шаховий рушій',              depth:11, ms:800,  slip:.05,  range:180},
-    {elo:3200, name:'Максимальна сила',           depth:11, ms:850,  slip:.04,  range:160}
+    {elo:200,  name:'Грає майже навмання',        rnd:.72, noise:620, depth:1},
+    {elo:400,  name:'Часто помиляється',          rnd:.48, noise:440, depth:1},
+    {elo:600,  name:'Бачить лише прості взяття',  rnd:.33, noise:320, depth:1},
+    {elo:800,  name:'Новачок',                    rnd:.19, noise:220, depth:1},
+    {elo:1000, name:'Знає основи',                rnd:.09, noise:140, depth:3},
+    {elo:1200, name:'Любитель',                   rnd:.055,noise:110, depth:3},
+    {elo:1400, name:'Бачить прості тактики',      rnd:.03, noise:90,  depth:4},
+    {elo:1600, name:'Клубний гравець',            rnd:.015,noise:60,  depth:4},
+    {elo:1800, name:'Сильний аматор',             rnd:.01, noise:50,  depth:4},
+    {elo:2000, name:'Кандидат у майстри',         depth:5,  ms:260,  slip:.14,  range:320},
+    {elo:2200, name:'Майстер',                    depth:6,  ms:400,  slip:.105, range:280},
+    {elo:2400, name:'Міжнародний майстер',        depth:7,  ms:500,  slip:.09,  range:250},
+    {elo:2600, name:'Гросмейстер',                depth:8,  ms:580,  slip:.075, range:220},
+    {elo:2800, name:'Супергросмейстер',           depth:9,  ms:650,  slip:.065, range:200},
+    {elo:3000, name:'Шаховий рушій',              depth:10, ms:720,  slip:.055, range:190},
+    {elo:3200, name:'Максимальна сила',           depth:10, ms:800,  slip:.05,  range:180}
   ];
   let timeScale=1;
   function cfgFor(elo){ return LEVELS[Math.max(0,Math.min(LEVELS.length-1,Math.round(elo/200)-1))] }
@@ -2303,9 +2303,9 @@ function eloDelta(R,O,S,acc,kind,tc,scale){
   const E=expScore(R,O), a=acc==null?0.6:acc;
   let d;
   if(kind==='ai'&&S>E) d=aiWin(R,O)*(S===1?1:0.35)*(0.7+0.6*a);   // gain vs AI: relative to the AI's level; a draw is worth 35%
+  else if(kind==='ai'&&S===0) d=-25*(0.6+0.8*E)*(1.3-0.6*a);   // mate / surrender / flag vs AI: 15..40, usually 20-30
   else{
-    const Ee=(kind==='ai'&&S===0)?Math.max(E,0.2):E;   // a loss (or surrender) vs AI always costs at least 20% of the stake
-    d=kFactor(R)*(S-Ee)*ELO_MULT;
+    d=kFactor(R)*(S-E)*ELO_MULT;
     if(d>0) d*=0.7+0.6*a; else d*=1.3-0.6*a;           // accurate play: bigger gains, smaller losses
   }
   if(d>0) d/=1+R/(kind==='ai'?8000:1500);                       // the higher your rating, the less a win gives (R=1500: half, R=3000: a third)
