@@ -460,6 +460,7 @@ body.an-mode .an-side{display:flex;animation:fadeup .4s ease both}
         <div class="an-hd"><span class="an-ico" id="an-ico" style="display:none"></span><b id="an-title">Початкова позиція</b><span class="an-mv" id="an-mv"></span></div>
         <p class="an-eng" id="an-eng"></p>
         <p class="an-ai" id="an-ai"></p>
+        <button type="button" class="rep-btn" id="an-retry" style="display:none;margin-top:8px" onclick="anRetry()">Повторити коментар ШІ</button>
       </div>
     </div>
   </div>
@@ -1369,7 +1370,7 @@ function addLog(text,cls=''){
 const AI_DEFAULT_MODEL='gemini-3.5-flash', AI_FALLBACK=['gemini-3.5-flash-lite','gemini-3.1-flash-lite'];
 // URL of your Cloudflare Worker (file ai-proxy-worker.js). Paste it here, e.g. 'https://pawn-ai.yourname.workers.dev'.
 // With it every visitor gets AI comments without any key of their own, and the Gemini key stays secret on the server.
-const AI_PROXY_URL='https://spring-feather-9e85.foxplay1foxplay.workers.dev/';
+const AI_PROXY_URL='';
 const AI_BUILTIN_KEY='';   // for local tests only: a key written here is visible to every visitor of the page
 const MQ={
   brilliant:{sym:'!!',name:'Блискучий хід',col:'#1baca6'},
@@ -1600,14 +1601,14 @@ function anPrompt(an){
   return {sys,text};
 }
 async function anCallProxy(sys,text){
-  const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),90000);
+  const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),150000);
   try{
     const r=await fetch(AI_PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sys,text}),signal:ctl.signal});
     const j=await r.json().catch(()=>({}));
     if(!r.ok||!Array.isArray(j.comments)) throw new Error(r.status===429?(j.error||'ліміт коментарів на сьогодні вичерпано'):(j.error||'сервіс коментарів недоступний'));
     return j.comments;
   }catch(e){
-    if(e&&e.name==='AbortError') throw new Error('час очікування вичерпано');
+    if(e&&e.name==='AbortError') throw new Error('ШІ відповідав надто довго');
     if(e instanceof TypeError) throw new Error('немає зв’язку з сервісом коментарів');
     throw e;
   }finally{clearTimeout(tm)}
@@ -1641,6 +1642,7 @@ async function anAI(an){
   } else {an.aiState='error';an.aiErr=err}
   anCard(an.pos,true);
 }
+function anRetry(){ if(AN){AN.aiState='idle';anAI(AN)} }
 function typeInto(el,text){
   clearInterval(twT);
   if(el.dataset.t===text) return;
@@ -1669,11 +1671,12 @@ function anCard(p,soft){
       else{
         clearInterval(twT); ai.dataset.t='';
         if(an.aiState==='loading'){ai.textContent='ШІ пише коментарі';ai.classList.add('wait')}
-        else if(an.aiState==='error') ai.textContent='Коментар ШІ недоступний: '+an.aiErr+'.';
+        else if(an.aiState==='error') ai.textContent='Коментар ШІ недоступний: '+String(an.aiErr).replace(/\.$/,'')+'.';
         else ai.textContent='';
       }
     }
   }
+  document.getElementById('an-retry').style.display=an.aiState==='error'?'':'none';
   if(!soft){card.classList.remove('swap');void card.offsetWidth;card.classList.add('swap')}
 }
 function anEvalUI(){
